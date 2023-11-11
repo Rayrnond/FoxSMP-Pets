@@ -1,0 +1,8 @@
+name: FoxSMP
+version: '${project.version}'
+main: com.reflexian.foxsmp.FoxSMP
+api-version: '1.20'
+depend:
+  - ProtocolLib
+authors: [Raymond, Whale]
+website: reflexian.com
