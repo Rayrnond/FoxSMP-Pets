@@ -52,5 +52,6 @@ public class BalloonImpl implements Balloon {
     public void hideFor(Player player) {
         task.removeShownTo(player);
     }
+
 }
 
