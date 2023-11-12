@@ -3,6 +3,8 @@ package com.reflexian.foxsmp.features.balloons.helpers;
 import com.reflexian.foxsmp.FoxSMP;
 import com.reflexian.foxsmp.features.balloons.Balloon;
 import com.reflexian.foxsmp.features.balloons.BalloonBlueprint;
+import com.reflexian.foxsmp.features.balloons.Skin;
+import com.reflexian.foxsmp.utilities.objects.HeadData;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -17,12 +19,14 @@ public class BalloonImpl implements Balloon {
     public static Map<Player, BalloonImpl> balloons=new HashMap<>();
 
     private final Player owner;
-    private final BalloonBlueprint blueprint;
+//    private final BalloonBlueprint blueprint;
+    private final Skin skin;
     private final BalloonHoverTask task;
 
-    public BalloonImpl(UUID owner, BalloonBlueprint blueprint) {
+    public BalloonImpl(UUID owner, Skin skin) {
         this.owner = Bukkit.getPlayer(owner);
-        this.blueprint = blueprint;
+        this.skin = skin;
+//        this.blueprint = blueprint;
         this.task = new BalloonHoverTask(this);
     }
 
@@ -31,10 +35,10 @@ public class BalloonImpl implements Balloon {
         this.task.runTaskTimerAsynchronously(FoxSMP.getInstance(), 0L, 2L);
     }
 
-    public static void setBalloon(Player owner, BalloonBlueprint blueprint) {
+    public static void setBalloon(Player owner, Skin skin) {
         BalloonImpl balloonImpl = balloons.getOrDefault(owner,null);
         if (balloonImpl!=null) balloonImpl.kill();
-        balloonImpl = new BalloonImpl(owner.getUniqueId(), blueprint);
+        balloonImpl = new BalloonImpl(owner.getUniqueId(), skin);
         balloons.put(owner, balloonImpl);
     }
 

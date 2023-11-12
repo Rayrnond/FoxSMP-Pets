@@ -5,9 +5,11 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.*;
+import com.reflexian.foxsmp.utilities.objects.ItemBuilder;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -132,7 +134,7 @@ public class BalloonHoverTask extends BukkitRunnable {
         PacketContainer equipmentPacket = new PacketContainer(PacketType.Play.Server.ENTITY_EQUIPMENT);
         equipmentPacket.getIntegers().write(0, entityId);
         equipmentPacket.getSlotStackPairLists().write(0, Collections.singletonList(
-                new Pair<>(EnumWrappers.ItemSlot.HEAD, impl.getBlueprint().getBalloonItem())));
+                new Pair<>(EnumWrappers.ItemSlot.HEAD, new ItemBuilder(Material.AIR).setSkull(impl.getSkin()).build())));
         protocolManager.sendServerPacket(player, equipmentPacket);
     }
 
