@@ -6,9 +6,12 @@ import java.util.UUID;
 
 public abstract class SMPPet {
 
+    private boolean spawned;
+    private boolean visible;
+
     private UUID uuid;
     private UUID owner;
-    private int level;
+    private double xp;
 
 
     public abstract String getName(); // used for config and saving
