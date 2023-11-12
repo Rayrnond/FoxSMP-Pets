@@ -1,9 +1,8 @@
 package com.reflexian.foxsmp;
 
-import com.reflexian.foxsmp.pets.helpers.ArmorStandHoverTask;
-import com.reflexian.foxsmp.pets.helpers.BalloonBlueprintImpl;
-import com.reflexian.foxsmp.pets.helpers.BalloonImpl;
-import com.reflexian.foxsmp.utilities.balloons.Skin;
+import com.reflexian.foxsmp.features.balloons.helpers.BalloonBlueprintImpl;
+import com.reflexian.foxsmp.features.balloons.helpers.BalloonImpl;
+import com.reflexian.foxsmp.features.balloons.Skin;
 import lombok.Getter;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -21,8 +20,7 @@ public final class FoxSMP extends JavaPlugin implements Listener {
     public void onEnable() {
         instance = this;
         saveDefaultConfig();
-//        this.getServer().getPluginManager().registerEvents(this, this);
-        new ArmorStandHoverTask().runTaskTimer(this, 0L, 1L);
+        this.getServer().getPluginManager().registerEvents(this, this);
 
     }
 
@@ -31,6 +29,7 @@ public final class FoxSMP extends JavaPlugin implements Listener {
 
     }
 
+    // todo remove after testing
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         BalloonImpl.setBalloon(event.getPlayer(), new BalloonBlueprintImpl().setSkin(Skin.DEFAULT_SKIN).setTrailColor(Color.darkGray));

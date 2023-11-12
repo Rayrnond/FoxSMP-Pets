@@ -1,6 +1,6 @@
-package com.reflexian.foxsmp.pets.list;
+package com.reflexian.foxsmp.features.pets.list;
 
-import com.reflexian.foxsmp.pets.SMPPet;
+import com.reflexian.foxsmp.features.pets.SMPPet;
 import com.reflexian.foxsmp.utilities.objects.HeadData;
 
 public class GlacialGuardianPet extends SMPPet {

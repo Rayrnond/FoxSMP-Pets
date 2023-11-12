@@ -2,7 +2,7 @@ package com.reflexian.foxsmp.utilities.objects;
 
 import com.comphenix.protocol.wrappers.WrappedGameProfile;
 import com.comphenix.protocol.wrappers.WrappedSignedProperty;
-import com.reflexian.foxsmp.utilities.balloons.Skin;
+import com.reflexian.foxsmp.features.balloons.Skin;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
@@ -126,7 +126,8 @@ public class ItemBuilder {
         try {
             profileField = itemMeta.getClass().getDeclaredField("profile");
             profileField.setAccessible(true);
-            profileField.set(itemMeta, profile);
+            profileField.set(itemMeta, profile.getHandle());
+            profileField.setAccessible(false);
         }
         catch (NoSuchFieldException | IllegalArgumentException | IllegalAccessException e) {
             e.printStackTrace();

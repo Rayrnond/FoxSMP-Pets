@@ -1,4 +1,4 @@
-package com.reflexian.foxsmp.utilities.balloons;
+package com.reflexian.foxsmp.features.balloons;
 
 import org.bukkit.inventory.ItemStack;
 
