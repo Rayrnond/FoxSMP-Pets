@@ -14,6 +14,9 @@ public abstract class SMPPet {
     private double xp;
 
 
+    public void spawn() {
+        this.spawned = true;
+    }
     public abstract String getName(); // used for config and saving
     public abstract HeadData getHeadData();
 

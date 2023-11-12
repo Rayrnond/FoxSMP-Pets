@@ -12,7 +12,7 @@ public class GlacialGuardianPet extends SMPPet {
 
     @Override
     public HeadData getHeadData() {
-        return HeadData.builder().name("").texture("").build();
+        return HeadData.builder().name("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjM4ZmViMDYyNGY0OWUwNTg1OTUzOTFiZTdmZjU1OWViZjVkNGYzYjgxN2IwNjNkNTQ0MTY0ODk1NzM1ZTk2NyJ9fX0=").texture("638feb0624f49e058595391be7ff559ebf5d4f3b817b063d544164895735e967").build();
     }
 
 
