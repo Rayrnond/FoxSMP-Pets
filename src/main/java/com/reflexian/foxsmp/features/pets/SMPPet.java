@@ -16,10 +16,6 @@ public abstract class SMPPet {
     private UUID owner;
     private double xp;
 
-    public SMPPet() {
-        balloon = new BalloonImpl(owner,getSkin());
-    }
-
 
     public abstract String getName(); // used for config and saving
     public abstract Skin getSkin();
