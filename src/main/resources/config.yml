@@ -1,16 +1,20 @@
+# Set region names to 'pve-zone' to have it as a pve-zone.
+
+
+# Get your texture and signature from https://mineskin.org
 pets:
   glacial_guardian:
     name: "Frostpaw"
-    texture: "texture"
-    signature: "signature"
+    texture: ""
+    signature: ""
   avalanche_artisan:
     name: "Snowflake"
     texture: "texture"
     signature: "signature"
   polar_explorer:
     name: "Glacier"
-    texture: "texture"
-    signature: "signature"
+    texture: "eyJ0aW1lc3RhbXAiOjE1NzY5NTI0NTUxOTIsInByb2ZpbGVJZCI6ImRlNTcxYTEwMmNiODQ4ODA4ZmU3YzlmNDQ5NmVjZGFkIiwicHJvZmlsZU5hbWUiOiJNSEZfTWluZXNraW4iLCJzaWduYXR1cmVSZXF1aXJlZCI6dHJ1ZSwidGV4dHVyZXMiOnsiU0tJTiI6eyJ1cmwiOiJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzNhYjI5NDEyOWJmOTM0MzFjOTY2ZmU4YTg5NzJlMDQ0ZTYzMzhmZWMzMzcwNDdiMmU3YTM2Nzk0MTUzYzJmMWEifX19"
+    signature: "VBfykdpP9WkDg2g7CF1tGyAY7HmPvslBdy9BLdTxM9X/RO4d1RM0EpjWemvSt083jkrT38gQYSBy7IEqz1YknaesW4FUE9G8PRFSrqaK1FXQWOpAwbX2tR++euptYPVTBBvsnL0SY9G9xgYMCJJdhqPQjLNFOcAcpaTZwf7UgTZQDgkZB7zcPfsdqm1nCoUelTjhG2v4/ucJ5cc3nr4MCa6BM25fKS9vAJEh64sWP2NbpV4XEsvIzxkky5DshptlBePXPDfCcjIF3mQVtH1mmTNzMdV/siyE+iOKNNqYlVB3ozhDffgQWhNBES7zwEZ+zugTgDejh4HXdO9UdpOhnAtz6D9fBOQ1hj8or/3s58rCXEEIJoStfKAT79tMsSbCCjqhUAPBCS8nx4ghVHCrq3aJiLw+26u5HuO4lezR9YbuP8iwyjRRlFiORv4bBFRH15Cn1Im8tn7pMyh/FB4+aNnppZb5gKMF9jBfF+9xKK1GHa15BuJBdLEbtdjc235PlmHlDQKV4NK0p9WJqJtAUsUqw3SiZz1K4oxTdPWHS6zteNV5lzSkH2YSF4qk4utSBrz4/HLIYibvjlIdNumwulXYt9z3cxdmrY9neB1tZqa8w0atOqmoZDPIH3EnPYJRqfAv2FMmSLLyh2bBAzlin9JaXSd1ejA0mevkDaQ3LzQ="
   northern_nomad:
     name: "Blizzard"
     texture: "texture"
@@ -24,6 +28,6 @@ pet-candy:
     - "&7Levels up your pet."
     - ""
     - "&e&lRIGHT CLICK &7to use."
-    -
+  xp: 200 # 200 xp for each candy
 
-formula: 100 * %level% # 100 xp required per level
+xp-per-level: 200 # 200 xp required per level
