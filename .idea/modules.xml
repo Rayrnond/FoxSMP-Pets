@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/FoxSMP.iml" filepath="$PROJECT_DIR$/FoxSMP.iml" />
+      <module fileurl="file://$PROJECT_DIR$/FoxSMP-Pets.iml" filepath="$PROJECT_DIR$/FoxSMP-Pets.iml" />
     </modules>
   </component>
 </project>
