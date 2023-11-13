@@ -1,5 +1,6 @@
 package com.reflexian.foxsmp.features.inventories;
 
+import com.reflexian.foxsmp.features.balloons.helpers.BalloonImpl;
 import com.reflexian.foxsmp.features.pets.SMPPet;
 import com.reflexian.foxsmp.features.pets.list.AvalancheArtisanPet;
 import com.reflexian.foxsmp.features.pets.list.GlacialGuardianPet;
@@ -25,7 +26,7 @@ public class JourneyCrystalGUI implements Inventory {
             player.closeInventory();
             return;
         }
-        InvUtils.showInventory(player,"mastergenerator", true,
+        InvUtils.showInventory(player,"journey", true,
 
                 new ClickAction("glacialguardian", (p, clickAction) -> {
                     setPet(playerData, new GlacialGuardianPet(playerData));
@@ -47,7 +48,12 @@ public class JourneyCrystalGUI implements Inventory {
     }
 
     private void setPet(PlayerData playerData, SMPPet pet) {
+        if (playerData.hasPet()) {
+            playerData.getPet().getBalloon().kill();
+        }
+        pet.setBalloon(new BalloonImpl(playerData.getUuid(), pet.getSkin()));
         playerData.setPet(pet);
+        playerData.getPet().getBalloon().startTask();
         PlayerData.save(playerData);
         Bukkit.getPlayer(playerData.getUuid()).sendMessage("§aYou have successfully set your pet to §e" + pet.getName() + "§a!");
     }

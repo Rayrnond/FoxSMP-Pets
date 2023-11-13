@@ -28,6 +28,7 @@ public class BalloonHoverTask extends BukkitRunnable {
     private final int entityId = (int) (Math.random() * Integer.MAX_VALUE);
     private final UUID armorStandUUID = UUID.randomUUID();
 
+    private final Queue<Player> tempList = new ConcurrentLinkedQueue<>();
     private final Queue<Player> shownTo = new ConcurrentLinkedQueue<>(); // using players since querying Player for each UUID every 1 tick is not profitable
     // this adds extra responsibility to always be up-to date with players logging on/off, but it's worth it long-term.
     // also this is a queue so that it can be removed & queried in O(1) time
@@ -38,11 +39,22 @@ public class BalloonHoverTask extends BukkitRunnable {
     public BalloonHoverTask(BalloonImpl impl) {
         this.impl = impl;
 
-        // check if this is on the main thread
-        if (Bukkit.isPrimaryThread()) {
-            throw new RuntimeException("BalloonHoverTask cannot be ran on the main thread!");
-        }
+    }
 
+    public boolean toggleAllHide() {
+        if (tempList.isEmpty()) {
+            tempList.addAll(shownTo);
+            for (Player player : shownTo) {
+                removeShownTo(player);
+            }
+            return true;
+        } else {
+            for (Player player : tempList) {
+                addShownTo(player);
+            }
+            tempList.clear();
+            return false;
+        }
     }
 
     public void addShownTo(Player player) {
@@ -66,6 +78,10 @@ public class BalloonHoverTask extends BukkitRunnable {
 
     @Override
     public void run() {
+        if (Bukkit.isPrimaryThread()) {
+            this.cancel();
+            throw new RuntimeException("BalloonHoverTask cannot be ran on the main thread!");
+        }
         try {
             double hoverHeight = Math.sin(phase);
             phase += Math.PI / 60; // Adjust speed of hovering here
@@ -91,6 +107,7 @@ public class BalloonHoverTask extends BukkitRunnable {
     private void despawnArmorStand(Player player) {
         PacketContainer packet = protocolManager.createPacket(PacketType.Play.Server.ENTITY_DESTROY);
         packet.getIntegerArrays().write(0, new int[]{entityId});
+        packet.getIntegers().write(0, 1);
         protocolManager.sendServerPacket(player, packet);
     }
 

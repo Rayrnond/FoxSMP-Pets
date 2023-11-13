@@ -14,9 +14,11 @@ public class UserDataSerializer implements JsonSerializer<PlayerData> {
 
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("uuid", playerData.getUuid().toString());
-        jsonObject.addProperty("petId", playerData.getPet().getUuid().toString());
-        jsonObject.addProperty("petName", playerData.getPet().getName());
-        jsonObject.addProperty("petXp", playerData.getPet().getXp());
+        if (playerData.getPet() != null) {
+            jsonObject.addProperty("petId", playerData.getPet().getUuid().toString());
+            jsonObject.addProperty("petName", playerData.getPet().getName());
+            jsonObject.addProperty("petXp", playerData.getPet().getXp());
+        }
         return jsonObject;
 
     }

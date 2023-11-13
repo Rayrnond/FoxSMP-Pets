@@ -23,9 +23,11 @@ public class CombatTask extends BukkitRunnable {
                 if (player == null || !player.isOnline()) continue;
                 PlayerData playerData = PlayerData.map.getOrDefault(player.getUniqueId(),null);
                 if (playerData == null) return;
-                if (playerData.hasPet() && playerData.getPet() instanceof NorthernNomadPet) {
-                    NorthernNomadPet pet = (NorthernNomadPet) playerData.getPet();
+                if (playerData.hasPet() && playerData.getPet() instanceof NorthernNomadPet pet) {
                     pet.updateSpeed(player, false);
+                }
+                if (playerData.hasPet()) {
+                    playerData.getPet().getBalloon().getTask().toggleAllHide();
                 }
             }
         }
