@@ -20,23 +20,44 @@ items:
     lore:
       - ''
 
-  money-artifact:
+  northernnomad:
     itemsadderID: ''
     material: SUNFLOWER
     amount: 1
     data: 0
-    displayname: <color:yellow>Money Artifact
+    displayname: '&fNorthern Nomad'
     slots: 13
     lore:
-      - <color:gray>%levitygens_mastergen_artifacts_contains_MONEY%
+      - '&7Click to set this as your pet.'
 
-  grinder-artifact:
+  avalancheartisan:
     itemsadderID: ''
-    material: DIAMOND_SWORD
+    material: SNOWBALL
     amount: 1
     data: 0
-    displayname: <color:yellow>Grinder Artifact
+    displayname: '&eAvalanche Artisan'
     slots: 20
     lore:
-      - <color:gray>%levitygens_mastergen_artifacts_contains_GRINDER%
+      - '&7Click to set this as your pet.'
+
+
+  polarexplorer:
+    itemsadderID: ''
+    material: BEACON
+    amount: 1
+    data: 0
+    displayname: '&cPolar Explorer'
+    slots: 24
+    lore:
+      - '&7Click to set this as your pet.'
+
+  glacialguardian:
+    itemsadderID: ''
+    material: CHARCOAL
+    amount: 1
+    data: 0
+    displayname: '&bGlacial Guardian'
+    slots: 31
+    lore:
+      - '&7Click to set this as your pet.'
 

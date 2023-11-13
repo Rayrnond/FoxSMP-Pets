@@ -2,11 +2,13 @@ package com.reflexian.foxsmp.features.pets.helpers;
 
 import com.reflexian.foxsmp.FoxSMP;
 import com.reflexian.foxsmp.features.candy.PetCandyItem;
+import com.reflexian.foxsmp.features.inventories.JourneyCrystalGUI;
 import com.reflexian.foxsmp.features.pets.SMPPet;
 import com.reflexian.foxsmp.features.pets.list.AvalancheArtisanPet;
 import com.reflexian.foxsmp.features.pets.list.GlacialGuardianPet;
 import com.reflexian.foxsmp.features.pets.list.NorthernNomadPet;
 import com.reflexian.foxsmp.features.pets.list.PolarExplorerPet;
+import com.reflexian.foxsmp.utilities.data.PlayerData;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
@@ -18,13 +20,17 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
 import me.lucko.helper.Events;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collection;
@@ -37,17 +43,29 @@ public class PetListeners {
 
         Events.subscribe(PlayerJoinEvent.class)
                 .handler(event -> {
-                    SMPPet pet = new AvalancheArtisanPet();
-                    SMPPet pet2 = new GlacialGuardianPet();
-                    SMPPet pet3 = new NorthernNomadPet();
-                    SMPPet pet4 = new PolarExplorerPet();
-                    event.getPlayer().getInventory().addItem(pet.getSkin().getHead().build());
-                    event.getPlayer().getInventory().addItem(pet2.getSkin().getHead().build());
-                    event.getPlayer().getInventory().addItem(pet3.getSkin().getHead().build());
-                    event.getPlayer().getInventory().addItem(pet4.getSkin().getHead().build());
+                    PlayerData playerData = PlayerData.load(event.getPlayer().getUniqueId());
+                    PlayerData.map.put(event.getPlayer().getUniqueId(), playerData);
+                    if (playerData.hasPet() && playerData.getPet() instanceof NorthernNomadPet) {
+                        NorthernNomadPet pet = (NorthernNomadPet) playerData.getPet();
+                        pet.updateSpeed(event.getPlayer(), false);
+
+                    } else if (playerData.getPet() == null || !playerData.hasPet()) {
+                        Bukkit.getScheduler().scheduleSyncDelayedTask(FoxSMP.getInstance(), () -> {
+                            new JourneyCrystalGUI().init(event.getPlayer());
+                        }, 40L);
+                    }
                 });
 
+        Events.subscribe(PlayerQuitEvent.class)
+                        .handler(event -> {
+                            PlayerData playerData = PlayerData.map.getOrDefault(event.getPlayer().getUniqueId(),null);
+                            if (playerData == null) return;
+                            PlayerData.save(playerData);
+                            PlayerData.map.remove(event.getPlayer().getUniqueId());
+                        });
         // glacial guardian
+
+
         Events.subscribe(EntityDamageEvent.class)
                 .handler(event -> {
 
@@ -57,16 +75,17 @@ public class PetListeners {
                             return;
                         }
 
-                        boolean hasPet = true; // add later
+                        final PlayerData playerData = PlayerData.map.getOrDefault(player.getUniqueId(), null);
+                        boolean hasPet = playerData.hasPet();
                         if (!hasPet) return;
-                        int petLevel = 5; // add later (between 0 and 100)
-                        double buff = 1 + 0.29 * petLevel; // 1% at level 0, 30% at level 100
+                        double buff = 1 + 0.29 * playerData.getPet().getLevel(); // 1% at level 0, 30% at level 100
                         double reduction = 1 - buff;
 
                         event.setDamage(event.getDamage() * reduction);
                     }
 
                 });
+
 
         // avalanche artisan
         Events.subscribe(EntityDamageByEntityEvent.class)
@@ -77,11 +96,10 @@ public class PetListeners {
                         if (!isPlayerInPveZone(player)) {
                             return;
                         }
-
-                        boolean hasPet = true; // add later
+                        final PlayerData playerData = PlayerData.map.getOrDefault(player.getUniqueId(), null);
+                        boolean hasPet = playerData.hasPet();
                         if (!hasPet) return;
-                        int petLevel = 5; // add later (between 0 and 100)
-                        double buff = 1 + 0.29 * petLevel; // 1% at level 0, 30% at level 100
+                        double buff = 1 + 0.29 * playerData.getPet().getLevel(); // 1% at level 0, 30% at level 100
                         double multiplier = 1 + buff;
                         event.setDamage(event.getDamage() * multiplier);
                     }
@@ -92,10 +110,10 @@ public class PetListeners {
         Events.subscribe(BlockBreakEvent.class)
                 .handler(event -> {
                     Player player = event.getPlayer();
-                    boolean hasPet = true; // add later
+                    final PlayerData playerData = PlayerData.map.getOrDefault(player.getUniqueId(), null);
+                    boolean hasPet = playerData.hasPet();
                     if (!hasPet) return;
-                    int petLevel = 5; // add later (between 0 and 100)
-                    double buff = 1 + 0.29 * petLevel; // 1% at level 0, 15% at level 100
+                    double buff = 1 + 0.29 * playerData.getPet().getLevel(); // 1% at level 0, 15% at level 100
                     boolean proc = new Random().nextDouble() < buff;
                     if (proc) {
                         Collection<ItemStack> items = event.getBlock().getDrops(player.getInventory().getItemInMainHand());

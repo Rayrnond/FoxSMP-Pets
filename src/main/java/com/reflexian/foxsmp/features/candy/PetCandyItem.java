@@ -1,6 +1,8 @@
 package com.reflexian.foxsmp.features.candy;
 
 import com.reflexian.foxsmp.FoxSMP;
+import com.reflexian.foxsmp.features.pets.list.NorthernNomadPet;
+import com.reflexian.foxsmp.utilities.data.PlayerData;
 import com.reflexian.foxsmp.utilities.objects.ItemBuilder;
 import de.tr7zw.nbtapi.NBT;
 import me.lucko.helper.Events;
@@ -58,7 +60,17 @@ public class PetCandyItem {
                        NBT.get(item, nbt -> {
                           if (nbt.hasTag("petcandy")) {
                               Player player = event.getPlayer();
-                              player.sendMessage("You used pet candy!");
+
+                              PlayerData playerData = PlayerData.map.getOrDefault(player.getUniqueId(),null);
+                              if (playerData == null || !playerData.hasPet()) {
+                                    player.sendMessage("§cYou don't have a pet!");
+                                  return;
+                              } else if (playerData.getPet().getLevel() == 100) {
+                                    player.sendMessage("§cYour pet is already level 100!");
+                                    return;
+                              }
+
+                              player.sendMessage("§eYou used pet candy!");
 
                               if (item.getAmount() > 1) {
                                   item.setAmount(item.getAmount() - 1);
@@ -66,7 +78,15 @@ public class PetCandyItem {
                               } else {
                                   player.getInventory().setItem(event.getHand(), null);
                               }
-                              // TODO add to player's exp here
+                              int amount = FoxSMP.getInstance().getConfig().getInt("pet-candy.xp",200);
+                              playerData.getPet().setXp(playerData.getPet().getXp() + amount);
+                              player.sendMessage("§aYour pet gained §e"+amount+"§a XP!");
+                              player.sendMessage("§aYour pet is now level §e"+playerData.getPet().getLevel()+"§a!");
+
+                              if (playerData.getPet() instanceof NorthernNomadPet) {
+                                  NorthernNomadPet pet = (NorthernNomadPet) playerData.getPet();
+                                  pet.updateSpeed(player, false);
+                              }
                           }
                        });
                    }
