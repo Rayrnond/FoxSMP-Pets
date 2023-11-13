@@ -3,6 +3,7 @@ package com.reflexian.foxsmp.utilities.objects;
 import com.comphenix.protocol.wrappers.WrappedGameProfile;
 import com.comphenix.protocol.wrappers.WrappedSignedProperty;
 import com.reflexian.foxsmp.features.balloons.Skin;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
@@ -86,6 +87,13 @@ public class ItemBuilder {
      */
     public ItemBuilder addUnsafeEnchantment(Enchantment ench, int level){
         is.addUnsafeEnchantment(ench, level);
+        return this;
+    }
+
+    public ItemBuilder setModel(int model) {
+        ItemMeta im = is.getItemMeta();
+        im.setCustomModelData(model);
+        is.setItemMeta(im);
         return this;
     }
 

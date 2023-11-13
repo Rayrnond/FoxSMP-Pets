@@ -2,9 +2,15 @@ package com.reflexian.foxsmp;
 
 import com.reflexian.foxsmp.features.balloons.Skin;
 import com.reflexian.foxsmp.features.balloons.helpers.BalloonImpl;
+import com.reflexian.foxsmp.features.pets.helpers.PetListeners;
+import com.reflexian.foxsmp.features.pets.helpers.PveZoneFlag;
 import com.reflexian.foxsmp.utilities.inventory.InvUtils;
+import com.sk89q.worldguard.WorldGuard;
 import fr.minuskube.inv.InventoryManager;
 import lombok.Getter;
+import org.bukkit.configuration.ConfigurationSection;
+import com.reflexian.foxsmp.features.candy.GivePetCandyCommand;
+import com.reflexian.foxsmp.features.candy.PetCandyItem;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -18,17 +24,29 @@ public final class FoxSMP extends JavaPlugin implements Listener {
 
     @Getter private static FoxSMP instance;
     @Getter private InventoryManager inventoryManager;
+    @Getter private PetCandyItem petCandyItem;
+    @Getter private PveZoneFlag pveZoneFlag;
 
     @Override
     public void onEnable() {
         instance = this;
         saveDefaultConfig();
-//        this.getServer().getPluginManager().registerEvents(this, this);
+        //this.getServer().getPluginManager().registerEvents(this, this);
+        new PetListeners();
 
         inventoryManager = new InventoryManager(this);
         inventoryManager.init();
         InvUtils.init();
         checkInvFile("journey.yml");
+
+        this.petCandyItem = new PetCandyItem(getConfig().getConfigurationSection("pet-candy"));
+        new GivePetCandyCommand().register();
+    }
+
+    @Override
+    public void onLoad() {
+        this.pveZoneFlag = new PveZoneFlag();
+        WorldGuard.getInstance().getFlagRegistry().register(pveZoneFlag);
     }
 
     @Override
@@ -37,10 +55,10 @@ public final class FoxSMP extends JavaPlugin implements Listener {
     }
 
     // todo remove after testing
-//    @EventHandler
-//    public void onJoin(PlayerJoinEvent event) {
-//        BalloonImpl.setBalloon(event.getPlayer(), Skin.DEFAULT_SKIN);
-//    }
+    //@EventHandler
+    //public void onJoin(PlayerJoinEvent event) {
+     //   BalloonImpl.setBalloon(event.getPlayer(), Skin.DEFAULT_SKIN);
+    //}
 
     private void checkInvFile(String file) {
         File configFile = new File(getDataFolder()+ "/inventories", file);

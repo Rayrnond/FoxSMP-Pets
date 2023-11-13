@@ -1,12 +1,29 @@
-#
-# Developed by Raymond and Whale.
-# reflexian.com
-#
+pets:
+  glacial_guardian:
+    name: "Frostpaw"
+    texture: "texture"
+    signature: "signature"
+  avalanche_artisan:
+    name: "Snowflake"
+    texture: "texture"
+    signature: "signature"
+  polar_explorer:
+    name: "Glacier"
+    texture: "texture"
+    signature: "signature"
+  northern_nomad:
+    name: "Blizzard"
+    texture: "texture"
+    signature: "signature"
 
+pet-candy:
+  material: "CARROT"
+  model: 1
+  name: "&dPet Candy"
+  lore:
+    - "&7Levels up your pet."
+    - ""
+    - "&e&lRIGHT CLICK &7to use."
+    -
 
-# The XP formula for leveling
-# %level% = current level
 formula: 100 * %level% # 100 xp required per level
-
-
-
