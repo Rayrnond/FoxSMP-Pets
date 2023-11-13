@@ -11,6 +11,7 @@ import com.reflexian.foxsmp.features.pets.helpers.CombatListener;
 import com.reflexian.foxsmp.features.pets.helpers.CombatTask;
 import com.reflexian.foxsmp.features.pets.helpers.PetListeners;
 import com.reflexian.foxsmp.features.pets.helpers.PveZoneFlag;
+import com.reflexian.foxsmp.utilities.Placeholders;
 import com.reflexian.foxsmp.utilities.inventory.InvUtils;
 import com.sk89q.worldguard.WorldGuard;
 import dev.jorel.commandapi.CommandAPI;
@@ -53,6 +54,8 @@ public final class FoxSMP extends JavaPlugin {
         new GivePetCandyCommand().register();
         new GiveJourneyCrystalCommand().register();
         new JourneyCrystalCommand().register();
+
+        new Placeholders().register();
     }
 
     @Override

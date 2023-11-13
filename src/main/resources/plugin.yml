@@ -9,5 +9,6 @@ depend:
 #  - ItemsAdder
 #  - SmartInvs
   - WorldGuard
+  - PlaceholderAPI
 authors: [Raymond, Whale]
 website: reflexian.com
