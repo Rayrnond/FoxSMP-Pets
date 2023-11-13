@@ -304,7 +304,10 @@ public class ItemBuilder {
         return this;
     }
 
-
+    public ItemBuilder setAmount(int amount) {
+        is.setAmount(amount);
+        return this;
+    }
 
 
     /**

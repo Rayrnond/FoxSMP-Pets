@@ -1,1 +1,12 @@
-# todo
+#
+# Developed by Raymond and Whale.
+# reflexian.com
+#
+
+
+# The XP formula for leveling
+# %level% = current level
+formula: 100 * %level% # 100 xp required per level
+
+
+
