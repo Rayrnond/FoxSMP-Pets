@@ -5,7 +5,6 @@ import com.reflexian.foxsmp.utilities.data.PlayerData;
 import me.lucko.helper.Events;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 
 public class CombatListener {
     public CombatListener(){
@@ -14,8 +13,12 @@ public class CombatListener {
                     if (event.getEntity() instanceof Player) {
                         PlayerData playerData = PlayerData.map.getOrDefault(event.getDamager().getUniqueId(),null);
                         if (playerData == null) return;
-                        if (playerData.hasPet() && playerData.getPet() instanceof NorthernNomadPet) {
-                            NorthernNomadPet pet = (NorthernNomadPet) playerData.getPet();
+                        if (CombatTask.INCOMBAT.containsKey(playerData.getUuid())) return;
+                        if (playerData.hasPet()) {
+                            playerData.getPet().getBalloon().getTask().toggleAllHide();
+                        }
+                        CombatTask.INCOMBAT.put(playerData.getUuid(),System.currentTimeMillis());
+                        if (playerData.hasPet() && playerData.getPet() instanceof NorthernNomadPet pet) {
                             pet.updateSpeed((Player) event.getDamager(), true);
                         }
                     }

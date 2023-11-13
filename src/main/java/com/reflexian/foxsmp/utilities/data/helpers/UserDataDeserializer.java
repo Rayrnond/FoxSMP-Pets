@@ -15,28 +15,24 @@ public class UserDataDeserializer implements JsonDeserializer<PlayerData> {
 
         JsonObject object = jsonElement.getAsJsonObject();
         PlayerData playerData = new PlayerData(UUID.fromString(object.get("uuid").getAsString()));
-        SMPPet pet = null;
-        switch (object.get("petName").getAsString()) {
-            default:
-                pet = new NonePet();
-                break;
-            case "avalanche_artisan":
-                 pet = new AvalancheArtisanPet(playerData);
-                break;
-            case "polar_explorer":
-                pet = new PolarExplorerPet(playerData);
-                break;
-            case "northern_nomad":
-                pet = new NorthernNomadPet(playerData);
-                break;
-            case "glacial_guardian":
-                pet = new GlacialGuardianPet(playerData);
-                break;
+
+        System.out.println("a1");
+        if (object.has("petName")) {
+            SMPPet pet = switch (object.get("petName").getAsString()) {
+                default -> new NonePet();
+                case "avalanche_artisan" -> new AvalancheArtisanPet(playerData);
+                case "polar_explorer" -> new PolarExplorerPet(playerData);
+                case "northern_nomad" -> new NorthernNomadPet(playerData);
+                case "glacial_guardian" -> new GlacialGuardianPet(playerData);
+            };
+            pet.setXp(object.get("petXp").getAsDouble());
+            pet.setUuid(UUID.fromString(object.get("petId").getAsString()));
+            pet.setBalloon(new BalloonImpl(playerData.getUuid(), pet.getSkin()));
+            pet.getBalloon().startTask();
+            playerData.setPet(pet);
+        } else {
+            playerData.setPet(null);
         }
-        pet.setXp(object.get("petXp").getAsDouble());
-        pet.setUuid(UUID.fromString(object.get("petId").getAsString()));
-        pet.setBalloon(new BalloonImpl(playerData.getUuid(), pet.getSkin()));
-        playerData.setPet(pet);
         return playerData;
     }
 }
