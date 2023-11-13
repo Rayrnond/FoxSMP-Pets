@@ -1,16 +1,16 @@
 package com.reflexian.foxsmp;
 
-import com.reflexian.foxsmp.features.balloons.helpers.BalloonHoverTask;
 import com.reflexian.foxsmp.features.balloons.helpers.BalloonImpl;
 import com.reflexian.foxsmp.features.candy.GivePetCandyCommand;
 import com.reflexian.foxsmp.features.candy.PetCandyItem;
+import com.reflexian.foxsmp.features.inventories.JourneyCrystalCommand;
+import com.reflexian.foxsmp.features.inventories.JourneyCrystalGUI;
 import com.reflexian.foxsmp.features.journeycrystal.GiveJourneyCrystalCommand;
 import com.reflexian.foxsmp.features.journeycrystal.JourneyCrystalItem;
 import com.reflexian.foxsmp.features.pets.helpers.CombatListener;
 import com.reflexian.foxsmp.features.pets.helpers.CombatTask;
 import com.reflexian.foxsmp.features.pets.helpers.PetListeners;
 import com.reflexian.foxsmp.features.pets.helpers.PveZoneFlag;
-import com.reflexian.foxsmp.utilities.data.PlayerData;
 import com.reflexian.foxsmp.utilities.inventory.InvUtils;
 import com.sk89q.worldguard.WorldGuard;
 import dev.jorel.commandapi.CommandAPI;
@@ -38,7 +38,7 @@ public final class FoxSMP extends JavaPlugin {
         new PetListeners();
         new CombatListener();
 
-        new CombatTask().runTaskLaterAsynchronously(this, 10L);
+        new CombatTask().runTaskTimer(this, 40, 10L);
 
         inventoryManager = new InventoryManager(this);
         inventoryManager.init();
@@ -52,6 +52,7 @@ public final class FoxSMP extends JavaPlugin {
 
         new GivePetCandyCommand().register();
         new GiveJourneyCrystalCommand().register();
+        new JourneyCrystalCommand().register();
     }
 
     @Override

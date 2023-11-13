@@ -16,7 +16,6 @@ public class UserDataDeserializer implements JsonDeserializer<PlayerData> {
         JsonObject object = jsonElement.getAsJsonObject();
         PlayerData playerData = new PlayerData(UUID.fromString(object.get("uuid").getAsString()));
 
-        System.out.println("a1");
         if (object.has("petName")) {
             SMPPet pet = switch (object.get("petName").getAsString()) {
                 default -> new NonePet();

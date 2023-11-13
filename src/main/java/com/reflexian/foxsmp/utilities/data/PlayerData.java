@@ -56,9 +56,7 @@ public class PlayerData {
         File dir = new File(getDataFolder()+"/data/" + uuid.toString());
         if (!dir.exists()) dir.mkdirs();
         File file = new File(getDataFolder()+"/data/" + uuid.toString() + "/user.json");
-        System.out.println("1");
         if (!file.exists()) {
-            System.out.println("2");
             Player player = Bukkit.getPlayer(uuid);
             if (player!=null) {
                 playerData.setPet(null);
@@ -67,14 +65,13 @@ public class PlayerData {
             return playerData;
         }
         try {
-            System.out.println("3");
             Gson gson = new GsonBuilder().setPrettyPrinting().registerTypeAdapter(PlayerData.class, new UserDataDeserializer()).serializeNulls().create();
             Reader reader = Files.newBufferedReader(Paths.get(file.getPath()));
             return gson.fromJson(reader, PlayerData.class);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        System.out.println("4");
+
         return playerData;
     }
 
