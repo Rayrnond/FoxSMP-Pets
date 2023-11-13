@@ -10,11 +10,11 @@ public class CombatListener {
     public CombatListener(){
         Events.subscribe(EntityDamageByEntityEvent.class)
                 .handler(event -> {
-                    if (event.getEntity() instanceof Player) {
+                    if (event.getDamager() instanceof Player) {
                         PlayerData playerData = PlayerData.map.getOrDefault(event.getDamager().getUniqueId(),null);
                         if (playerData == null) return;
                         if (CombatTask.INCOMBAT.containsKey(playerData.getUuid())) return;
-                        if (playerData.hasPet()) {
+                        if (playerData.hasPet() && playerData.getPet().getBalloon().getTask().getTempList().isEmpty()) {
                             playerData.getPet().getBalloon().getTask().toggleAllHide();
                         }
                         CombatTask.INCOMBAT.put(playerData.getUuid(),System.currentTimeMillis());

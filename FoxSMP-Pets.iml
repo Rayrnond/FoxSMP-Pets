@@ -10,6 +10,9 @@
       </configuration>
     </facet>
   </component>
+  <component name="McpModuleSettings">
+    <option name="srgType" value="SRG" />
+  </component>
   <component name="copyright">
     <Base>
       <setting name="state" value="2" />

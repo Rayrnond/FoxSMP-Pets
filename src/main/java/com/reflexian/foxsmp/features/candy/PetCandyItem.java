@@ -3,6 +3,7 @@ package com.reflexian.foxsmp.features.candy;
 import com.reflexian.foxsmp.FoxSMP;
 import com.reflexian.foxsmp.features.pets.list.NorthernNomadPet;
 import com.reflexian.foxsmp.utilities.data.PlayerData;
+import com.reflexian.foxsmp.utilities.inventory.InvLang;
 import com.reflexian.foxsmp.utilities.objects.ItemBuilder;
 import de.tr7zw.nbtapi.NBT;
 import me.lucko.helper.Events;
@@ -25,8 +26,8 @@ public class PetCandyItem {
 
     public PetCandyItem(ConfigurationSection section) {
         Material candyMaterial = Material.getMaterial(section.getString("material", "CARROT"));
-        String candyName = section.getString("name", "&dPet Candy");
-        List<String> candyLore = section.getStringList("lore");
+        String candyName = InvLang.format(section.getString("name", "&dPet Candy"));
+        List<String> candyLore = section.getStringList("lore").stream().map(InvLang::format).toList();
         int model = section.getInt("model", 0);
 
         if (candyMaterial == null) {
@@ -83,8 +84,9 @@ public class PetCandyItem {
                               player.sendMessage("§aYour pet gained §e"+amount+"§a XP!");
                               player.sendMessage("§aYour pet is now level §e"+playerData.getPet().getLevel()+"§a!");
 
-                              if (playerData.getPet() instanceof NorthernNomadPet) {
-                                  NorthernNomadPet pet = (NorthernNomadPet) playerData.getPet();
+                              PlayerData.save(playerData);
+
+                              if (playerData.getPet() instanceof NorthernNomadPet pet) {
                                   pet.updateSpeed(player, false);
                               }
                           }

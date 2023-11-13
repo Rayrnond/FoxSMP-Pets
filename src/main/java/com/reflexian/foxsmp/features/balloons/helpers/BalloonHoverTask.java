@@ -6,10 +6,13 @@ import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.*;
 import com.reflexian.foxsmp.utilities.objects.ItemBuilder;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
 import lombok.Getter;
+import net.minecraft.network.protocol.game.PacketPlayOutEntityDestroy;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -92,7 +95,7 @@ public class BalloonHoverTask extends BukkitRunnable {
                     shownTo.remove(onlinePlayer);
                     continue;
                 } else if (onlinePlayer.getWorld()!=impl.getOwner().getWorld())continue; // continue if the player literally cannot see the pet.
-                teleportArmorStand(onlinePlayer, hoverHeight);
+                teleportArmorStand(hoverHeight);
             }
 
             if (phase >= 2 * Math.PI) {
@@ -105,9 +108,15 @@ public class BalloonHoverTask extends BukkitRunnable {
     }
 
     private void despawnArmorStand(Player player) {
-        PacketContainer packet = protocolManager.createPacket(PacketType.Play.Server.ENTITY_DESTROY);
-        packet.getIntegerArrays().write(0, new int[]{entityId});
-        packet.getIntegers().write(0, 1);
+        PacketContainer packet = protocolManager.createPacket(PacketType.Play.Server.ENTITY_TELEPORT);
+        packet.getIntegers().write(0, entityId);
+        packet.getDoubles()
+                .write(0, 0.0)
+                .write(1, 0.0)
+                .write(2, 0.0);
+        packet.getBooleans()
+                .write(0, false);
+
         protocolManager.sendServerPacket(player, packet);
     }
 
@@ -155,9 +164,9 @@ public class BalloonHoverTask extends BukkitRunnable {
         protocolManager.sendServerPacket(player, equipmentPacket);
     }
 
-    private void teleportArmorStand(Player player, double yOffset) throws InvocationTargetException {
+    private void teleportArmorStand(double yOffset) throws InvocationTargetException {
 
-        Location loc = calculatePetLocation(player.getLocation());
+        Location loc = calculatePetLocation(impl.getOwner().getLocation());
 
         PacketContainer packet = protocolManager.createPacket(PacketType.Play.Server.ENTITY_TELEPORT);
         packet.getIntegers().write(0, entityId);
@@ -168,7 +177,9 @@ public class BalloonHoverTask extends BukkitRunnable {
         packet.getBooleans()
                 .write(0, false);
 
-        protocolManager.sendServerPacket(player, packet);
+        for (Player player : shownTo) {
+            protocolManager.sendServerPacket(player, packet);
+        }
     }
 
 

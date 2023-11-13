@@ -21,7 +21,7 @@ public class NorthernNomadPet extends SMPPet {
             return;
         }
         //0.2 * (50/100) + 0.15  [75%]
-        player.setWalkSpeed((float) (0.2 * (getLevel()/100)) + 0.15f);
+        player.setWalkSpeed((float) ((0.15 * (getLevel()/100))) + 0.2f);
     }
 
 }

@@ -4,6 +4,7 @@ import com.reflexian.foxsmp.FoxSMP;
 import com.reflexian.foxsmp.features.inventories.JourneyCrystalGUI;
 import com.reflexian.foxsmp.features.pets.list.NorthernNomadPet;
 import com.reflexian.foxsmp.utilities.data.PlayerData;
+import com.reflexian.foxsmp.utilities.inventory.InvLang;
 import com.reflexian.foxsmp.utilities.objects.ItemBuilder;
 import de.tr7zw.nbtapi.NBT;
 import me.lucko.helper.Events;
@@ -24,8 +25,8 @@ public class JourneyCrystalItem {
 
     public JourneyCrystalItem(ConfigurationSection section) {
         Material crystalMaterial = Material.getMaterial(section.getString("material", "DIAMOND"));
-        String crystalName = section.getString("name", "&dJourney Crystal");
-        List<String> crystalLore = section.getStringList("lore");
+        String crystalName = InvLang.format(section.getString("name", "&dJourney Crystal"));
+        List<String> crystalLore = section.getStringList("lore").stream().map(InvLang::format).toList();
         int model = section.getInt("model", 0);
 
         if (crystalMaterial == null) {
@@ -66,7 +67,9 @@ public class JourneyCrystalItem {
                                   return;
                               }
 
-
+                              if (playerData.hasPet()) {
+                                  playerData.getPet().getBalloon().kill();
+                              }
                               playerData.setPet(null);
                               PlayerData.save(playerData);
                               player.sendMessage("§eYou used journey crystal!");
