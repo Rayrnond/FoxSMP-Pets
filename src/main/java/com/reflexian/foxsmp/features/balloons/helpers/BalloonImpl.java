@@ -30,7 +30,7 @@ public class BalloonImpl implements Balloon {
         try {
             if(!this.task.isCancelled()) this.task.cancel();
         }catch (IllegalStateException ignored){}
-        this.task.runTaskTimerAsynchronously(FoxSMP.getInstance(), 0L, 5L);
+        this.task.runTaskTimerAsynchronously(FoxSMP.getInstance(), 0L, 2L);
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
             task.addShownTo(onlinePlayer);
         }

@@ -29,6 +29,11 @@ pet-candy:
     - ""
     - "&e&lRIGHT CLICK &7to use."
   xp: 200 # 200 xp for each candy
+  recipe:
+    1: CARROT
+    4: CARROT
+    6: CARROT
+    8: CARROT
 
 journey-crystal:
   material: "DIAMOND"

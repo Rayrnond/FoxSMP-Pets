@@ -47,8 +47,9 @@ public class PetCandyItem {
             item.setBoolean("petcandy", true);
         });
 
-        //ShapedRecipe recipe = new ShapedRecipe(new NamespacedKey("foxsmp", "petcandy"), petCandyItem);
-        //Bukkit.getServer().addRecipe(recipe);
+        ShapedRecipe recipe = new ShapedRecipe(new NamespacedKey("foxsmp", "petcandy"), petCandyItem);
+        setRecipeFromConfig(section.getConfigurationSection("recipe"), recipe);
+        Bukkit.getServer().addRecipe(recipe);
 
         Events.subscribe(PlayerInteractEvent.class)
                 .handler(event -> {
@@ -104,19 +105,25 @@ public class PetCandyItem {
     private static void setRecipeFromConfig(ConfigurationSection config, ShapedRecipe recipe) {
         // Define the crafting grid shape based on the keys
         String[] shape = new String[]{"ABC", "DEF", "GHI"};
-
+        recipe.shape(shape);
         for (int i = 0; i < shape.length; i++) {
             String row = shape[i];
             StringBuilder newRow = new StringBuilder();
-            for (char c : row.toCharArray()) {
-                String key = config.getString(Integer.toString(i * 3 + row.indexOf(c)));
+            for (char recipeElement : row.toCharArray()) {
+                String key = config.getString(Integer.toString(i * 3 + row.indexOf(recipeElement)));
                 if (key != null && !key.isEmpty()) {
                     Material ingredientMaterial = Material.getMaterial(key);
                     if (ingredientMaterial != null) {
-                        recipe.setIngredient(c, ingredientMaterial);
+                        recipe.setIngredient(recipeElement, ingredientMaterial);
+                    } else {
+                        recipe.setIngredient(recipeElement, Material.AIR);
+                        System.out.println("Invalid Material name: " + key);
                     }
+                } else {
+                    recipe.setIngredient(recipeElement, Material.AIR);
+                    System.out.println("No key found for slot " + recipeElement);
                 }
-                newRow.append(c);
+                newRow.append(recipeElement);
             }
             shape[i] = newRow.toString();
         }
