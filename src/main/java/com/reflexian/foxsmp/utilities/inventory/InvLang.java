@@ -34,9 +34,7 @@ public class InvLang {
 //    }
 
     public static ItemStack itemStackInvs(YamlConfiguration c, String s, Player player) {
-        var ref = new Object() {
-            ItemBuilder builder = new ItemBuilder(Material.valueOf(c.getString(s + ".material").toUpperCase()));
-        };
+        ItemBuilder builder = new ItemBuilder(Material.valueOf(c.getString(s + ".material").toUpperCase()));
 
         if (c.contains(s + ".itemsadderID")) {
             String id = c.getString(s + ".itemsadderID");
@@ -47,21 +45,21 @@ public class InvLang {
                     throw new RuntimeException("Failed to serialize item with ID: " + s + ". Could not find ItemsAdder item with id " + id);
                 }
 
-                ref.builder = new ItemBuilder(stack.getItemStack());
+                builder = new ItemBuilder(stack.getItemStack());
             }
         }
 
-        if (c.contains(s + ".data")) ref.builder.setDurability((byte) c.getInt(s + ".data"));
-        if (c.contains(s + ".amount")) ref.builder.setAmount(c.getInt(s + ".amount"));
-        if (c.contains(s + ".displayname")) ref.builder.setName(format(c.getString(s + ".displayname")));
+        if (c.contains(s + ".data")) builder.setDurability((byte) c.getInt(s + ".data"));
+        if (c.contains(s + ".amount")) builder.setAmount(c.getInt(s + ".amount"));
+        if (c.contains(s + ".displayname")) builder.setName(format(c.getString(s + ".displayname")));
         if (c.contains(s + ".lore")) {
             List<String> lore = format(c.getStringList(s + ".lore"));
             for (String s1 : lore) {
 
-                ref.builder.addLoreLine(s1);
+                builder.addLoreLine(s1);
             }
         }
-        return ref.builder.build();
+        return builder.build();
     }
 
 
