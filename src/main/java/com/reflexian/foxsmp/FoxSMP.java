@@ -2,6 +2,8 @@ package com.reflexian.foxsmp;
 
 import com.reflexian.foxsmp.features.candy.GivePetCandyCommand;
 import com.reflexian.foxsmp.features.candy.PetCandyItem;
+import com.reflexian.foxsmp.features.journeycrystal.GiveJourneyCrystalCommand;
+import com.reflexian.foxsmp.features.journeycrystal.JourneyCrystalItem;
 import com.reflexian.foxsmp.features.pets.helpers.CombatListener;
 import com.reflexian.foxsmp.features.pets.helpers.CombatTask;
 import com.reflexian.foxsmp.features.pets.helpers.PetListeners;
@@ -25,6 +27,7 @@ public final class FoxSMP extends JavaPlugin implements Listener {
     @Getter private static FoxSMP instance;
     @Getter private InventoryManager inventoryManager;
     @Getter private PetCandyItem petCandyItem;
+    @Getter private JourneyCrystalItem journeyCrystalItem;
     @Getter private PveZoneFlag pveZoneFlag;
 
     @Override
@@ -42,7 +45,9 @@ public final class FoxSMP extends JavaPlugin implements Listener {
         checkInvFile("journey.yml");
 
         this.petCandyItem = new PetCandyItem(getConfig().getConfigurationSection("pet-candy"));
+        this.journeyCrystalItem = new JourneyCrystalItem(getConfig().getConfigurationSection("journey-crystal"));
         new GivePetCandyCommand().register();
+        new GiveJourneyCrystalCommand().register();
     }
 
     @Override
