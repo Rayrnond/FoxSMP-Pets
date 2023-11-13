@@ -27,16 +27,15 @@ public class BalloonImpl implements Balloon {
     }
 
     public void startTask(){
-        if(!this.task.isCancelled()) this.task.cancel();
+        try {
+            if(!this.task.isCancelled()) this.task.cancel();
+        }catch (IllegalStateException ignored){}
         this.task.runTaskTimerAsynchronously(FoxSMP.getInstance(), 0L, 2L);
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            task.addShownTo(onlinePlayer);
+        }
     }
 
-    public static void setBalloon(Player owner, Skin skin) {
-        BalloonImpl balloonImpl = balloons.getOrDefault(owner,null);
-        if (balloonImpl!=null) balloonImpl.kill();
-        balloonImpl = new BalloonImpl(owner.getUniqueId(), skin);
-        balloons.put(owner, balloonImpl);
-    }
 
     @Override
     public void kill() {

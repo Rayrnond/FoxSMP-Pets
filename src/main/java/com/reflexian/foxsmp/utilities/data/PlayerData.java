@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.reflexian.foxsmp.FoxSMP;
 import com.reflexian.foxsmp.features.pets.SMPPet;
 import com.reflexian.foxsmp.utilities.data.helpers.UserDataDeserializer;
+import com.reflexian.foxsmp.utilities.data.helpers.UserDataSerializer;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -44,7 +45,7 @@ public class PlayerData {
         File file = new File(getDataFolder()+"/data/" + player.getUuid().toString() + "/user.json");
         file.delete();
         file.createNewFile();
-        Gson gson = new GsonBuilder().setPrettyPrinting().registerTypeAdapter(PlayerData.class, new UserDataDeserializer()).create();
+        Gson gson = new GsonBuilder().setPrettyPrinting().registerTypeAdapter(PlayerData.class, new UserDataSerializer()).serializeNulls().create();
         try (Writer writer = new FileWriter(file)) {
             gson.toJson(player, writer);
         }
@@ -64,12 +65,13 @@ public class PlayerData {
             return playerData;
         }
         try {
-            Gson gson = new GsonBuilder().setPrettyPrinting().registerTypeAdapter(PlayerData.class, new UserDataDeserializer()).create();
+            Gson gson = new GsonBuilder().setPrettyPrinting().registerTypeAdapter(PlayerData.class, new UserDataDeserializer()).serializeNulls().create();
             Reader reader = Files.newBufferedReader(Paths.get(file.getPath()));
             return gson.fromJson(reader, PlayerData.class);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+
         return playerData;
     }
 

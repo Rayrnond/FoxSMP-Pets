@@ -1,6 +1,7 @@
 package com.reflexian.foxsmp.features.pets.helpers;
 
 import com.reflexian.foxsmp.FoxSMP;
+import com.reflexian.foxsmp.features.balloons.helpers.BalloonImpl;
 import com.reflexian.foxsmp.features.candy.PetCandyItem;
 import com.reflexian.foxsmp.features.inventories.JourneyCrystalGUI;
 import com.reflexian.foxsmp.features.pets.SMPPet;
@@ -43,12 +44,15 @@ public class PetListeners {
 
         Events.subscribe(PlayerJoinEvent.class)
                 .handler(event -> {
+
+                    for (BalloonImpl value : BalloonImpl.balloons.values()) {
+                        value.showFor(event.getPlayer());
+                    }
+
                     PlayerData playerData = PlayerData.load(event.getPlayer().getUniqueId());
                     PlayerData.map.put(event.getPlayer().getUniqueId(), playerData);
-                    if (playerData.hasPet() && playerData.getPet() instanceof NorthernNomadPet) {
-                        NorthernNomadPet pet = (NorthernNomadPet) playerData.getPet();
+                    if (playerData.hasPet() && playerData.getPet() instanceof NorthernNomadPet pet) {
                         pet.updateSpeed(event.getPlayer(), false);
-
                     } else if (playerData.getPet() == null || !playerData.hasPet()) {
                         Bukkit.getScheduler().scheduleSyncDelayedTask(FoxSMP.getInstance(), () -> {
                             new JourneyCrystalGUI().init(event.getPlayer());
@@ -58,8 +62,15 @@ public class PetListeners {
 
         Events.subscribe(PlayerQuitEvent.class)
                         .handler(event -> {
+                            for (BalloonImpl value : BalloonImpl.balloons.values()) {
+                                value.hideFor(event.getPlayer());
+                            }
+
                             PlayerData playerData = PlayerData.map.getOrDefault(event.getPlayer().getUniqueId(),null);
                             if (playerData == null) return;
+                            if (playerData.hasPet()) {
+                                playerData.getPet().getBalloon().kill();
+                            }
                             PlayerData.save(playerData);
                             PlayerData.map.remove(event.getPlayer().getUniqueId());
                         });
@@ -110,17 +121,16 @@ public class PetListeners {
         Events.subscribe(BlockBreakEvent.class)
                 .handler(event -> {
                     Player player = event.getPlayer();
+
+                    if (!event.getBlock().getType().name().endsWith("ORE")) return;
                     final PlayerData playerData = PlayerData.map.getOrDefault(player.getUniqueId(), null);
                     boolean hasPet = playerData.hasPet();
                     if (!hasPet) return;
                     double buff = 1 + 0.29 * playerData.getPet().getLevel(); // 1% at level 0, 15% at level 100
                     boolean proc = new Random().nextDouble() < buff;
                     if (proc) {
-                        Collection<ItemStack> items = event.getBlock().getDrops(player.getInventory().getItemInMainHand());
-                        for (ItemStack item : items) {
-                            if (item.getType().name().contains("ORE")) {
-                                item.setAmount(item.getAmount() * 2);
-                            }
+                        for (ItemStack drop : event.getBlock().getDrops(player.getInventory().getItemInMainHand(), player)) {
+                            event.getPlayer().getWorld().dropItem(event.getBlock().getLocation(), drop);
                         }
                     }
                 });

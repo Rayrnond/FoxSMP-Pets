@@ -3,7 +3,6 @@ package com.reflexian.foxsmp.utilities.inventory;
 import com.reflexian.foxsmp.utilities.objects.ItemBuilder;
 import dev.lone.itemsadder.api.CustomStack;
 import lombok.experimental.UtilityClass;
-import lombok.var;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
