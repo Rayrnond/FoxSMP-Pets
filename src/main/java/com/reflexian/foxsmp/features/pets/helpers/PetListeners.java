@@ -37,6 +37,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Collection;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 public class PetListeners {
 
@@ -49,15 +50,18 @@ public class PetListeners {
                         value.showFor(event.getPlayer());
                     }
 
-                    PlayerData playerData = PlayerData.load(event.getPlayer().getUniqueId());
-                    PlayerData.map.put(event.getPlayer().getUniqueId(), playerData);
-                    if (playerData.hasPet() && playerData.getPet() instanceof NorthernNomadPet pet) {
-                        pet.updateSpeed(event.getPlayer(), false);
-                    } else if (playerData.getPet() == null || !playerData.hasPet()) {
+                    Bukkit.getScheduler().runTaskAsynchronously(FoxSMP.getInstance(),()->{
+                        PlayerData playerData = PlayerData.load(event.getPlayer().getUniqueId());
+                        PlayerData.map.put(event.getPlayer().getUniqueId(), playerData);
                         Bukkit.getScheduler().scheduleSyncDelayedTask(FoxSMP.getInstance(), () -> {
-                            new JourneyCrystalGUI().init(event.getPlayer());
+                            if (playerData.hasPet() && playerData.getPet() instanceof NorthernNomadPet pet) {
+                                pet.updateSpeed(event.getPlayer(), false);
+                            } else if (playerData.getPet() == null || !playerData.hasPet()) {
+                                new JourneyCrystalGUI().init(event.getPlayer());
+                            }
                         }, 40L);
-                    }
+
+                    });
                 });
 
         Events.subscribe(PlayerQuitEvent.class)
@@ -74,7 +78,6 @@ public class PetListeners {
                             PlayerData.save(playerData);
                             PlayerData.map.remove(event.getPlayer().getUniqueId());
                         });
-        // glacial guardian
 
 
         Events.subscribe(EntityDamageEvent.class)
@@ -89,6 +92,7 @@ public class PetListeners {
                         final PlayerData playerData = PlayerData.map.getOrDefault(player.getUniqueId(), null);
                         boolean hasPet = playerData.hasPet();
                         if (!hasPet) return;
+                        if (!(playerData.getPet() instanceof GlacialGuardianPet pet)) return;
                         double buff = 1 + 0.29 * playerData.getPet().getLevel(); // 1% at level 0, 30% at level 100
                         double reduction = 1 - buff;
 
@@ -110,6 +114,7 @@ public class PetListeners {
                         final PlayerData playerData = PlayerData.map.getOrDefault(player.getUniqueId(), null);
                         boolean hasPet = playerData.hasPet();
                         if (!hasPet) return;
+                        if (!(playerData.getPet() instanceof AvalancheArtisanPet pet)) return;
                         double buff = 1 + 0.29 * playerData.getPet().getLevel(); // 1% at level 0, 30% at level 100
                         double multiplier = 1 + buff;
                         event.setDamage(event.getDamage() * multiplier);
@@ -126,6 +131,7 @@ public class PetListeners {
                     final PlayerData playerData = PlayerData.map.getOrDefault(player.getUniqueId(), null);
                     boolean hasPet = playerData.hasPet();
                     if (!hasPet) return;
+                    if (!(playerData.getPet() instanceof PolarExplorerPet)) return;
                     double buff = 1 + 0.29 * playerData.getPet().getLevel(); // 1% at level 0, 15% at level 100
                     boolean proc = new Random().nextDouble() < buff;
                     if (proc) {

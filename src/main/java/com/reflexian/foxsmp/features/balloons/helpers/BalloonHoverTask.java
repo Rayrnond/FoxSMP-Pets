@@ -36,11 +36,23 @@ public class BalloonHoverTask extends BukkitRunnable {
     // this adds extra responsibility to always be up-to date with players logging on/off, but it's worth it long-term.
     // also this is a queue so that it can be removed & queried in O(1) time
 
+    private PacketContainer spawnPacket;
+    private PacketContainer despawnPacket;
+
     private double phase = 0.0;
 
 
     public BalloonHoverTask(BalloonImpl impl) {
         this.impl = impl;
+
+        despawnPacket= protocolManager.createPacket(PacketType.Play.Server.ENTITY_TELEPORT);
+        despawnPacket.getIntegers().write(0, entityId);
+        despawnPacket.getDoubles()
+                .write(0, 0.0)
+                .write(1, 0.0)
+                .write(2, 0.0);
+        despawnPacket.getBooleans()
+                .write(0, false);
 
     }
 
@@ -89,14 +101,8 @@ public class BalloonHoverTask extends BukkitRunnable {
             double hoverHeight = Math.sin(phase);
             phase += Math.PI / 60; // Adjust speed of hovering here
 
-
-            for (Player onlinePlayer : shownTo) {
-                if (onlinePlayer == null || !onlinePlayer.isOnline()){
-                    shownTo.remove(onlinePlayer);
-                    continue;
-                } else if (onlinePlayer.getWorld()!=impl.getOwner().getWorld())continue; // continue if the player literally cannot see the pet.
-                teleportArmorStand(hoverHeight);
-            }
+            Location loc = calculatePetLocation(impl.getOwner().getLocation());
+            teleportArmorStand(loc,hoverHeight);
 
             if (phase >= 2 * Math.PI) {
                 phase = 0;
@@ -108,16 +114,7 @@ public class BalloonHoverTask extends BukkitRunnable {
     }
 
     private void despawnArmorStand(Player player) {
-        PacketContainer packet = protocolManager.createPacket(PacketType.Play.Server.ENTITY_TELEPORT);
-        packet.getIntegers().write(0, entityId);
-        packet.getDoubles()
-                .write(0, 0.0)
-                .write(1, 0.0)
-                .write(2, 0.0);
-        packet.getBooleans()
-                .write(0, false);
-
-        protocolManager.sendServerPacket(player, packet);
+        protocolManager.sendServerPacket(player, despawnPacket);
     }
 
     private void spawnArmorStand(Player player, double yOffset) {
@@ -164,9 +161,7 @@ public class BalloonHoverTask extends BukkitRunnable {
         protocolManager.sendServerPacket(player, equipmentPacket);
     }
 
-    private void teleportArmorStand(double yOffset) throws InvocationTargetException {
-
-        Location loc = calculatePetLocation(impl.getOwner().getLocation());
+    private void teleportArmorStand(Location loc, double yOffset) throws InvocationTargetException {
 
         PacketContainer packet = protocolManager.createPacket(PacketType.Play.Server.ENTITY_TELEPORT);
         packet.getIntegers().write(0, entityId);
@@ -188,8 +183,6 @@ public class BalloonHoverTask extends BukkitRunnable {
         Location loc = playerLocation.clone();
         double angle = Math.toRadians(loc.getYaw() - 180.0F);
         loc = loc.add(Math.cos(angle), 0, Math.sin(angle)).add(new Vector());
-        loc.setYaw(playerLocation.getYaw());
-        loc.setDirection(playerLocation.getDirection());
         return loc;
     }
 }
