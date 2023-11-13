@@ -26,7 +26,7 @@ public class PlayerData {
     public static final Map<UUID,PlayerData> map = new java.util.concurrent.ConcurrentHashMap<>();
 
     private final UUID uuid;
-    private SMPPet pet;
+    private SMPPet pet=null;
 
     public PlayerData(UUID uuid) {
         this.uuid = uuid;

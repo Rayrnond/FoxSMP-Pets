@@ -2,6 +2,7 @@ package com.reflexian.foxsmp.features.pets.helpers;
 
 import com.reflexian.foxsmp.FoxSMP;
 import com.reflexian.foxsmp.features.candy.PetCandyItem;
+import com.reflexian.foxsmp.features.inventories.JourneyCrystalGUI;
 import com.reflexian.foxsmp.features.pets.SMPPet;
 import com.reflexian.foxsmp.features.pets.list.AvalancheArtisanPet;
 import com.reflexian.foxsmp.features.pets.list.GlacialGuardianPet;
@@ -19,6 +20,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
 import me.lucko.helper.Events;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -47,6 +49,10 @@ public class PetListeners {
                         NorthernNomadPet pet = (NorthernNomadPet) playerData.getPet();
                         pet.updateSpeed(event.getPlayer(), false);
 
+                    } else if (playerData.getPet() == null || !playerData.hasPet()) {
+                        Bukkit.getScheduler().scheduleSyncDelayedTask(FoxSMP.getInstance(), () -> {
+                            new JourneyCrystalGUI().init(event.getPlayer());
+                        }, 40L);
                     }
                 });
 

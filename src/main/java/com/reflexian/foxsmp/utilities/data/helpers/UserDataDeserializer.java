@@ -21,16 +21,16 @@ public class UserDataDeserializer implements JsonDeserializer<PlayerData> {
                 pet = new NonePet();
                 break;
             case "avalanche_artisan":
-                 pet = new AvalancheArtisanPet();
+                 pet = new AvalancheArtisanPet(playerData);
                 break;
             case "polar_explorer":
-                pet = new PolarExplorerPet();
+                pet = new PolarExplorerPet(playerData);
                 break;
             case "northern_nomad":
-                pet = new NorthernNomadPet();
+                pet = new NorthernNomadPet(playerData);
                 break;
             case "glacial_guardian":
-                pet = new GlacialGuardianPet();
+                pet = new GlacialGuardianPet(playerData);
                 break;
         }
         pet.setXp(object.get("petXp").getAsDouble());

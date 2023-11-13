@@ -30,4 +30,13 @@ pet-candy:
     - "&e&lRIGHT CLICK &7to use."
   xp: 200 # 200 xp for each candy
 
+journey-crystal:
+  material: "DIAMOND"
+  model: 1
+  name: "&dJourney Crystal"
+  lore:
+    - "&cResets your pet"
+    - ""
+    - "&e&lSHIFT RIGHT CLICK &7to use."
+
 xp-per-level: 200 # 200 xp required per level
