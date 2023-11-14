@@ -3,6 +3,7 @@ package com.reflexian.foxsmp.features.balloons.helpers;
 import com.reflexian.foxsmp.FoxSMP;
 import com.reflexian.foxsmp.features.balloons.Balloon;
 import com.reflexian.foxsmp.features.balloons.Skin;
+import com.reflexian.foxsmp.features.pets.SMPPet;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -18,11 +19,14 @@ public class BalloonImpl implements Balloon {
 
     private final Player owner;
     private final Skin skin;
+    private final SMPPet pet;
     private final BalloonHoverTask task;
 
-    public BalloonImpl(UUID owner, Skin skin) {
+    public BalloonImpl(UUID owner, Skin skin, SMPPet pet) {
         this.owner = Bukkit.getPlayer(owner);
+        if (this.owner == null) throw new NullPointerException("Owner cannot be null!");
         this.skin = skin;
+        this.pet = pet;
         this.task = new BalloonHoverTask(this);
     }
 

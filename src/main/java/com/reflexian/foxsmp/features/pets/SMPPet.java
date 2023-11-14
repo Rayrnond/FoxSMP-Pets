@@ -8,7 +8,10 @@ import com.reflexian.foxsmp.utilities.data.PlayerData;
 import com.reflexian.foxsmp.utilities.objects.HeadData;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -24,15 +27,21 @@ public abstract class SMPPet {
     private UUID owner;
     private double xp=0;
 
+    private transient String cachedName="";
     private transient int level;
 
     public SMPPet(){
         this.uuid=UUID.randomUUID();
+        ConfigurationSection section = FoxSMP.getInstance().getConfig().getConfigurationSection("pets." + getName());
+        cachedName = ChatColor.translateAlternateColorCodes('&', section.getString("name", "Pet"));
     }
     public SMPPet(PlayerData playerData) {
         this.uuid=UUID.randomUUID();
         this.owner = playerData.getUuid();
         this.xp = 0;
+
+        ConfigurationSection section = FoxSMP.getInstance().getConfig().getConfigurationSection("pets." + getName());
+        cachedName = ChatColor.translateAlternateColorCodes('&', section.getString("name", "Pet"));
     }
 
     public abstract String getName(); // used for config and saving
@@ -52,5 +61,12 @@ public abstract class SMPPet {
         int formula = FoxSMP.getInstance().getConfig().getInt("xp-per-level",200);
         this.level = (int) Math.floor(xp/formula);
         if (level>100) level=100;
+
+        if (this.balloon != null) {
+            for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                balloon.getPet().getBalloon().getTask().updateNametag(onlinePlayer);
+            }
+        }
+
     }
 }

@@ -44,4 +44,5 @@ journey-crystal:
     - ""
     - "&e&lSHIFT RIGHT CLICK &7to use."
 
+pet-nametag-format: "%name% [Lvl: %level%]"
 xp-per-level: 200 # 200 xp required per level

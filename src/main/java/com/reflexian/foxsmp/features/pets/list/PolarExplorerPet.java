@@ -15,4 +15,9 @@ public class PolarExplorerPet extends SMPPet {
         return "polar_explorer";
     }
 
+    @Override
+    public String getNiceName() {
+        return "Polar Explorer";
+    }
+
 }

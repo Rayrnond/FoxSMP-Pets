@@ -15,6 +15,11 @@ public class NorthernNomadPet extends SMPPet {
         return "northern_nomad";
     }
 
+    @Override
+    public String getNiceName() {
+        return "Northern Nomad";
+    }
+
     public void updateSpeed(Player player, boolean combat) {
         if (combat) {
             player.setWalkSpeed(0.2f);

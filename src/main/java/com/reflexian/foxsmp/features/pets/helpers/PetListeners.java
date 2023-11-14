@@ -2,7 +2,6 @@ package com.reflexian.foxsmp.features.pets.helpers;
 
 import com.reflexian.foxsmp.FoxSMP;
 import com.reflexian.foxsmp.features.balloons.helpers.BalloonImpl;
-import com.reflexian.foxsmp.features.candy.PetCandyItem;
 import com.reflexian.foxsmp.features.inventories.JourneyCrystalGUI;
 import com.reflexian.foxsmp.features.pets.SMPPet;
 import com.reflexian.foxsmp.features.pets.list.AvalancheArtisanPet;
@@ -11,135 +10,134 @@ import com.reflexian.foxsmp.features.pets.list.NorthernNomadPet;
 import com.reflexian.foxsmp.features.pets.list.PolarExplorerPet;
 import com.reflexian.foxsmp.utilities.data.PlayerData;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.flags.StateFlag;
-import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
-import me.lucko.helper.Events;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Collection;
-import java.util.Random;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
+import java.util.*;
 
-public class PetListeners {
+public class PetListeners implements Listener {
 
-    public PetListeners() {
+    @EventHandler
+    public void onJoin(PlayerJoinEvent event) {
+        Bukkit.getScheduler().runTaskAsynchronously(FoxSMP.getInstance(),()->{
+            PlayerData playerData = PlayerData.load(event.getPlayer().getUniqueId());
+            PlayerData.map.put(event.getPlayer().getUniqueId(), playerData);
+            Bukkit.getScheduler().scheduleSyncDelayedTask(FoxSMP.getInstance(), () -> {
+                if (playerData.hasPet() && playerData.getPet() instanceof NorthernNomadPet pet) {
+                    pet.updateSpeed(event.getPlayer(), false);
+                } else if (playerData.getPet() == null || !playerData.hasPet()) {
+                    new JourneyCrystalGUI().init(event.getPlayer());
+                }
 
-        Events.subscribe(PlayerJoinEvent.class)
-                .handler(event -> {
+                for (BalloonImpl value : BalloonImpl.balloons.values()) {
+                    value.showFor(event.getPlayer());
+                }
+            }, 40L);
 
-                    Bukkit.getScheduler().runTaskAsynchronously(FoxSMP.getInstance(),()->{
-                        PlayerData playerData = PlayerData.load(event.getPlayer().getUniqueId());
-                        PlayerData.map.put(event.getPlayer().getUniqueId(), playerData);
-                        Bukkit.getScheduler().scheduleSyncDelayedTask(FoxSMP.getInstance(), () -> {
-                            if (playerData.hasPet() && playerData.getPet() instanceof NorthernNomadPet pet) {
-                                pet.updateSpeed(event.getPlayer(), false);
-                            } else if (playerData.getPet() == null || !playerData.hasPet()) {
-                                new JourneyCrystalGUI().init(event.getPlayer());
-                            }
+        });
+    }
 
-                            for (BalloonImpl value : BalloonImpl.balloons.values()) {
-                                value.showFor(event.getPlayer());
-                            }
-                        }, 40L);
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        for (BalloonImpl value : BalloonImpl.balloons.values()) {
+            value.hideFor(event.getPlayer());
+        }
 
-                    });
-                });
+        PlayerData playerData = PlayerData.map.getOrDefault(event.getPlayer().getUniqueId(),null);
+        if (playerData == null) return;
+        if (playerData.hasPet()) {
+            playerData.getPet().getBalloon().kill();
+        }
+        PlayerData.save(playerData);
+        PlayerData.map.remove(event.getPlayer().getUniqueId());
+    }
 
-        Events.subscribe(PlayerQuitEvent.class)
-                        .handler(event -> {
-                            for (BalloonImpl value : BalloonImpl.balloons.values()) {
-                                value.hideFor(event.getPlayer());
-                            }
+    @EventHandler
+    public void onSwitchWorld(PlayerChangedWorldEvent event) {
+        recentSwaps.add(event.getPlayer().getUniqueId());
+    }
 
-                            PlayerData playerData = PlayerData.map.getOrDefault(event.getPlayer().getUniqueId(),null);
-                            if (playerData == null) return;
-                            if (playerData.hasPet()) {
-                                playerData.getPet().getBalloon().kill();
-                            }
-                            PlayerData.save(playerData);
-                            PlayerData.map.remove(event.getPlayer().getUniqueId());
-                        });
+    private final List<UUID> recentSwaps = new ArrayList<>();
+    @EventHandler
+    public void onWalk(PlayerMoveEvent event) {
+        if (recentSwaps.contains(event.getPlayer().getUniqueId())) {
+            recentSwaps.remove(event.getPlayer().getUniqueId());
+            PlayerData playerData = PlayerData.map.getOrDefault(event.getPlayer().getUniqueId(),null);
+            if (playerData == null) return;
+            playerData.getPet().getBalloon().getTask().respawn();
+        }
+    }
 
+    @EventHandler
+    public void onDamage(EntityDamageEvent event) {
+        if (event.getEntity() instanceof Player player) {
+            if (isPlayerInPveZone(player)) {
+                return;
+            }
 
-        Events.subscribe(EntityDamageEvent.class)
-                .handler(event -> {
+            final PlayerData playerData = PlayerData.map.getOrDefault(player.getUniqueId(), null);
+            if (playerData == null) return;
+            boolean hasPet = playerData.hasPet();
+            if (!hasPet) return;
+            if (!(playerData.getPet() instanceof GlacialGuardianPet)) return;
+            double buff = (1 + 0.29 * playerData.getPet().getLevel())/100; // 1% at level 0, 30% at level 100
+            double reduction = 1 - buff;
 
-                    if (event.getEntity() instanceof Player) {
-                        Player player = (Player) event.getEntity();
-                        if (isPlayerInPveZone(player)) {
-                            return;
-                        }
-
-                        final PlayerData playerData = PlayerData.map.getOrDefault(player.getUniqueId(), null);
-                        boolean hasPet = playerData.hasPet();
-                        if (!hasPet) return;
-                        if (!(playerData.getPet() instanceof GlacialGuardianPet pet)) return;
-                        double buff = 1 + 0.29 * playerData.getPet().getLevel(); // 1% at level 0, 30% at level 100
-                        double reduction = 1 - buff;
-
-                        event.setDamage(event.getDamage() * reduction);
-                    }
-
-                });
+            event.setDamage(event.getDamage() * reduction);
+        }
+    }
 
 
-        // avalanche artisan
-        Events.subscribe(EntityDamageByEntityEvent.class)
-                .handler(event -> {
+    @EventHandler
+    public void onDamageByEntity(EntityDamageByEntityEvent event) {
+        if (event.getDamager() instanceof Player player) {
+            if (!isPlayerInPveZone(player)) {
+                return;
+            }
+            final PlayerData playerData = PlayerData.map.getOrDefault(player.getUniqueId(), null);
+            if (playerData == null) return;
+            boolean hasPet = playerData.hasPet();
+            if (!hasPet) return;
+            if (!(playerData.getPet() instanceof AvalancheArtisanPet)) return;
+            double buff = (1 + 0.29 * playerData.getPet().getLevel())/100; // 1% at level 0, 30% at level 100
+            double multiplier = 1 + buff;
+            event.setDamage(event.getDamage() * multiplier);
+        }
+    }
 
-                    if (event.getDamager() instanceof Player) {
-                        Player player = (Player) event.getDamager();
-                        if (!isPlayerInPveZone(player)) {
-                            return;
-                        }
-                        final PlayerData playerData = PlayerData.map.getOrDefault(player.getUniqueId(), null);
-                        boolean hasPet = playerData.hasPet();
-                        if (!hasPet) return;
-                        if (!(playerData.getPet() instanceof AvalancheArtisanPet pet)) return;
-                        double buff = 1 + 0.29 * playerData.getPet().getLevel(); // 1% at level 0, 30% at level 100
-                        double multiplier = 1 + buff;
-                        event.setDamage(event.getDamage() * multiplier);
-                    }
+    @EventHandler
+    public void onBlockBreak(BlockBreakEvent event) {
+        Player player = event.getPlayer();
 
-                });
-
-        // polar explorer
-        Events.subscribe(BlockBreakEvent.class)
-                .handler(event -> {
-                    Player player = event.getPlayer();
-
-                    if (!event.getBlock().getType().name().endsWith("ORE")) return;
-                    final PlayerData playerData = PlayerData.map.getOrDefault(player.getUniqueId(), null);
-                    boolean hasPet = playerData.hasPet();
-                    if (!hasPet) return;
-                    if (!(playerData.getPet() instanceof PolarExplorerPet)) return;
-                    double buff = 1 + 0.29 * playerData.getPet().getLevel(); // 1% at level 0, 15% at level 100
-                    boolean proc = new Random().nextDouble() < buff;
-                    if (proc) {
-                        for (ItemStack drop : event.getBlock().getDrops(player.getInventory().getItemInMainHand(), player)) {
-                            event.getPlayer().getWorld().dropItem(event.getBlock().getLocation(), drop);
-                        }
-                    }
-                });
+        if (!event.getBlock().getType().name().endsWith("ORE")) return;
+        final PlayerData playerData = PlayerData.map.getOrDefault(player.getUniqueId(), null);
+        if (playerData == null) return;
+        boolean hasPet = playerData.hasPet();
+        if (!hasPet) return;
+        if (!(playerData.getPet() instanceof PolarExplorerPet)) return;
+        double buff = 1 + 0.29 * playerData.getPet().getLevel(); // 1% at level 0, 15% at level 100
+        boolean proc = new Random().nextDouble() < (buff / 100);
+        if (proc) {
+            for (ItemStack drop : event.getBlock().getDrops(player.getInventory().getItemInMainHand(), player)) {
+                event.getPlayer().getWorld().dropItem(event.getBlock().getLocation(), drop);
+            }
+        }
     }
 
     private boolean isPlayerInPveZone(Player player) {

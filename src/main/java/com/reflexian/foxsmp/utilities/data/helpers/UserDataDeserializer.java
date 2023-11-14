@@ -24,10 +24,10 @@ public class UserDataDeserializer implements JsonDeserializer<PlayerData> {
                 case "northern_nomad" -> new NorthernNomadPet(playerData);
                 case "glacial_guardian" -> new GlacialGuardianPet(playerData);
             };
-            pet.setXp(object.get("petXp").getAsDouble());
             pet.setUuid(UUID.fromString(object.get("petId").getAsString()));
-            pet.setBalloon(new BalloonImpl(playerData.getUuid(), pet.getSkin()));
+            pet.setBalloon(new BalloonImpl(playerData.getUuid(), pet.getSkin(), pet));
             pet.getBalloon().startTask();
+            pet.setXp(object.get("petXp").getAsDouble());
             playerData.setPet(pet);
         } else {
             playerData.setPet(null);

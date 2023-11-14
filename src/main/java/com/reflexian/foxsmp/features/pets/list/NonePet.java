@@ -9,4 +9,9 @@ public class NonePet extends SMPPet {
         return "none";
     }
 
+    @Override
+    public String getNiceName() {
+        return "null";
+    }
+
 }

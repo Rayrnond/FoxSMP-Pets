@@ -6,13 +6,13 @@ import com.reflexian.foxsmp.utilities.data.PlayerData;
 import com.reflexian.foxsmp.utilities.inventory.InvLang;
 import com.reflexian.foxsmp.utilities.objects.ItemBuilder;
 import de.tr7zw.nbtapi.NBT;
-import me.lucko.helper.Events;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.LightningStrike;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
@@ -51,49 +51,53 @@ public class PetCandyItem {
         setRecipeFromConfig(section.getConfigurationSection("recipe"), recipe);
         Bukkit.getServer().addRecipe(recipe);
 
-        Events.subscribe(PlayerInteractEvent.class)
-                .handler(event -> {
-                   if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-                       ItemStack item = event.getItem();
-                       if (item == null) return;
-                       if (event.getHand() == null) return;
-                       if (item.getType() != candyMaterial) return;
 
-                       NBT.get(item, nbt -> {
-                          if (nbt.hasTag("petcandy")) {
-                              Player player = event.getPlayer();
+        Listener listener = new Listener() {
+            @EventHandler
+            public void onInteractWithCandy(PlayerInteractEvent event) {
+                if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+                    ItemStack item = event.getItem();
+                    if (item == null) return;
+                    if (event.getHand() == null) return;
+                    if (item.getType() != candyMaterial) return;
 
-                              PlayerData playerData = PlayerData.map.getOrDefault(player.getUniqueId(),null);
-                              if (playerData == null || !playerData.hasPet()) {
-                                    player.sendMessage("§cYou don't have a pet!");
-                                  return;
-                              } else if (playerData.getPet().getLevel() == 100) {
-                                    player.sendMessage("§cYour pet is already level 100!");
-                                    return;
-                              }
+                    NBT.get(item, nbt -> {
+                        if (nbt.hasTag("petcandy")) {
+                            Player player = event.getPlayer();
 
-                              player.sendMessage("§eYou used pet candy!");
+                            PlayerData playerData = PlayerData.map.getOrDefault(player.getUniqueId(),null);
+                            if (playerData == null || !playerData.hasPet()) {
+                                player.sendMessage("§cYou don't have a pet!");
+                                return;
+                            } else if (playerData.getPet().getLevel() == 100) {
+                                player.sendMessage("§cYour pet is already level 100!");
+                                return;
+                            }
 
-                              if (item.getAmount() > 1) {
-                                  item.setAmount(item.getAmount() - 1);
-                                  player.getInventory().setItem(event.getHand(), item);
-                              } else {
-                                  player.getInventory().setItem(event.getHand(), null);
-                              }
-                              int amount = FoxSMP.getInstance().getConfig().getInt("pet-candy.xp",200);
-                              playerData.getPet().setXp(playerData.getPet().getXp() + amount);
-                              player.sendMessage("§aYour pet gained §e"+amount+"§a XP!");
-                              player.sendMessage("§aYour pet is now level §e"+playerData.getPet().getLevel()+"§a!");
+                            player.sendMessage("§eYou used pet candy!");
 
-                              PlayerData.save(playerData);
+                            if (item.getAmount() > 1) {
+                                item.setAmount(item.getAmount() - 1);
+                                player.getInventory().setItem(event.getHand(), item);
+                            } else {
+                                player.getInventory().setItem(event.getHand(), null);
+                            }
+                            int amount = FoxSMP.getInstance().getConfig().getInt("pet-candy.xp",200);
+                            playerData.getPet().setXp(playerData.getPet().getXp() + amount);
+                            player.sendMessage("§aYour pet gained §e"+amount+"§a XP!");
+                            player.sendMessage("§aYour pet is now level §e"+playerData.getPet().getLevel()+"§a!");
 
-                              if (playerData.getPet() instanceof NorthernNomadPet pet) {
-                                  pet.updateSpeed(player, false);
-                              }
-                          }
-                       });
-                   }
-                });
+                            PlayerData.save(playerData);
+
+                            if (playerData.getPet() instanceof NorthernNomadPet pet) {
+                                pet.updateSpeed(player, false);
+                            }
+                        }
+                    });
+                }
+            }
+        };
+        FoxSMP.getInstance().getServer().getPluginManager().registerEvents(listener, FoxSMP.getInstance());
     }
 
     public void givePlayerCandy(Player player, int amount) {

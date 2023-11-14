@@ -4,12 +4,10 @@ import com.reflexian.foxsmp.features.balloons.helpers.BalloonImpl;
 import com.reflexian.foxsmp.features.candy.GivePetCandyCommand;
 import com.reflexian.foxsmp.features.candy.PetCandyItem;
 import com.reflexian.foxsmp.features.inventories.JourneyCrystalCommand;
-import com.reflexian.foxsmp.features.inventories.JourneyCrystalGUI;
 import com.reflexian.foxsmp.features.journeycrystal.GiveJourneyCrystalCommand;
 import com.reflexian.foxsmp.features.journeycrystal.JourneyCrystalItem;
 import com.reflexian.foxsmp.features.pets.PetCommand;
 import com.reflexian.foxsmp.features.pets.helpers.CombatListener;
-import com.reflexian.foxsmp.features.pets.helpers.CombatTask;
 import com.reflexian.foxsmp.features.pets.helpers.PetListeners;
 import com.reflexian.foxsmp.features.pets.helpers.PveZoneFlag;
 import com.reflexian.foxsmp.utilities.Placeholders;
@@ -19,6 +17,7 @@ import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPIBukkitConfig;
 import fr.minuskube.inv.InventoryManager;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -32,15 +31,17 @@ public final class FoxSMP extends JavaPlugin {
     @Getter private PetCandyItem petCandyItem;
     @Getter private JourneyCrystalItem journeyCrystalItem;
     @Getter private PveZoneFlag pveZoneFlag;
+    @Getter private String FORMAT = "";
 
     @Override
     public void onEnable() {
         instance = this;
         saveDefaultConfig();
-        new PetListeners();
-        new CombatListener();
 
-        new CombatTask().runTaskTimer(this, 40, 10L);
+        Bukkit.getServer().getPluginManager().registerEvents(new CombatListener(), this);
+        Bukkit.getServer().getPluginManager().registerEvents(new PetListeners(), this);
+
+//        new CombatTask().runTaskTimer(this, 40, 10L);
 
         checkInvFile("journey.yml");
         inventoryManager = new InventoryManager(this);
@@ -55,9 +56,11 @@ public final class FoxSMP extends JavaPlugin {
         new GivePetCandyCommand().register();
         new GiveJourneyCrystalCommand().register();
         new JourneyCrystalCommand().register();
-        new PetCommand().register();
+//        new PetCommand().register();
 
         new Placeholders().register();
+
+        FORMAT = getConfig().getString("pet-nametag-format", "[Lvl: %level%]");
     }
 
     @Override

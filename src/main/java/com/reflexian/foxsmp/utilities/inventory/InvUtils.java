@@ -46,13 +46,13 @@ public class InvUtils {
         showInventory(player,fileName,false,clickActions);
     }
 
-    public static void showInventory(Player player, String fileName, boolean updateSec, ClickAction... clickActions) {
+    public static SmartInventory showInventory(Player player, String fileName, boolean updateSec, ClickAction... clickActions) {
         final var instance = FoxSMP.getInstance();
         YamlConfiguration c = inventories.getOrDefault(fileName,null);
         if (c==null) {
             player.sendMessage("§cSomething has gone wrong, contact an administrator!");
             instance.getLogger().severe("Couldn't find inventory file for " + fileName+"!");
-            return;
+            return null;
         }
         int size = c.getInt("size",54);
         InventoryProvider inventoryProvider = new InventoryProvider() {
@@ -123,8 +123,9 @@ public class InvUtils {
                 }
             }
         };
-        SmartInventory inv = SmartInventory.builder().id(c.getString("title")).provider(inventoryProvider).size((size/9), 9).title(InvLang.format(c.getString("title"))).manager(instance.getInventoryManager()).build();
+        SmartInventory inv = SmartInventory.builder().closeable(false).id(c.getString("title")).provider(inventoryProvider).size((size/9), 9).title(InvLang.format(c.getString("title"))).manager(instance.getInventoryManager()).build();
         inv.open(player);
+        return inv;
     }
 
 

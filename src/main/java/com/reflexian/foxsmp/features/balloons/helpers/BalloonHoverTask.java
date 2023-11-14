@@ -5,14 +5,12 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.*;
+import com.reflexian.foxsmp.FoxSMP;
 import com.reflexian.foxsmp.utilities.objects.ItemBuilder;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
 import lombok.Getter;
-import net.minecraft.network.protocol.game.PacketPlayOutEntityDestroy;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -30,6 +28,8 @@ public class BalloonHoverTask extends BukkitRunnable {
     private final BalloonImpl impl;
     private final int entityId = (int) (Math.random() * Integer.MAX_VALUE);
     private final UUID armorStandUUID = UUID.randomUUID();
+
+    private boolean hidden = false;
 
     private final Queue<Player> tempList = new ConcurrentLinkedQueue<>();
     private final Queue<Player> shownTo = new ConcurrentLinkedQueue<>(); // using players since querying Player for each UUID every 1 tick is not profitable
@@ -62,12 +62,14 @@ public class BalloonHoverTask extends BukkitRunnable {
             for (Player player : shownTo) {
                 removeShownTo(player);
             }
+            hidden = true;
             return true;
         } else {
             for (Player player : tempList) {
                 addShownTo(player);
             }
             tempList.clear();
+            hidden = false;
             return false;
         }
     }
@@ -89,6 +91,16 @@ public class BalloonHoverTask extends BukkitRunnable {
             despawnArmorStand(player);
         }
         shownTo.clear();
+    }
+
+    public void respawn() {
+        final Location l = calculatePetLocation(impl.getOwner().getLocation());
+        for (Player player : shownTo) {
+            if (player == null || !player.isOnline()) continue;
+            despawnArmorStand(player);
+            if (!impl.getOwner().getWorld().equals(player.getWorld())) continue;
+            spawnArmorStand(player, l.getY());
+        }
     }
 
     @Override
@@ -133,25 +145,7 @@ public class BalloonHoverTask extends BukkitRunnable {
 
         protocolManager.sendServerPacket(player, packet);
 
-        packet = protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
-        packet.getIntegers().write(0, entityId);
-
-        WrappedDataWatcher dataWatcher = new WrappedDataWatcher();
-        dataWatcher.setEntity(player);
-        WrappedDataWatcher.Serializer serializer = WrappedDataWatcher.Registry.get(Byte.class);
-        dataWatcher.setObject(0, serializer, (byte) (0x20 | 0x40)); // invisible, glowing
-        dataWatcher.setObject(15, serializer, (byte) (0x01 | 0x08 | 0x10)); // small, baseplate, marker
-
-        final List<WrappedDataValue> wrappedDataValueList = new ArrayList<>();
-        for (final WrappedWatchableObject entry : dataWatcher.getWatchableObjects()) {
-            if (entry == null) continue;
-            final WrappedDataWatcher.WrappedDataWatcherObject watcherObject = entry.getWatcherObject();
-            wrappedDataValueList.add(new WrappedDataValue(watcherObject.getIndex(), watcherObject.getSerializer(), entry.getRawValue()));
-        }
-
-        packet.getDataValueCollectionModifier().write(0, wrappedDataValueList);
-
-        protocolManager.sendServerPacket(player, packet);
+        updateNametag(player);
 
         // Set armor stand's helmet
         PacketContainer equipmentPacket = new PacketContainer(PacketType.Play.Server.ENTITY_EQUIPMENT);
@@ -169,13 +163,46 @@ public class BalloonHoverTask extends BukkitRunnable {
                 .write(0, loc.getX())
                 .write(1, loc.getY() + yOffset + 0.8)
                 .write(2, loc.getZ());
+
+        packet.getBytes().write(0, (byte) (loc.getYaw() * 256.0F / 360.0F));
         packet.getBooleans()
                 .write(0, false);
 
         for (Player player : shownTo) {
+            if (!player.getWorld().equals(loc.getWorld())) continue;
             protocolManager.sendServerPacket(player, packet);
         }
     }
+
+
+    public void updateNametag(Player player) {
+        PacketContainer packet = protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
+        packet.getIntegers()
+                .write(0, entityId);
+        WrappedDataWatcher dataWatcher = new WrappedDataWatcher();
+        dataWatcher.setEntity(player);
+        WrappedDataWatcher.Serializer serializer = WrappedDataWatcher.Registry.get(Byte.class);
+        dataWatcher.setObject(0, serializer, (byte) (0x20)); // invisible, glowing //0x20
+        dataWatcher.setObject(15, serializer, (byte) (0x01 | 0x08)); // small, baseplate, marker//0x08
+
+        Optional<?> opt = Optional
+                .of(WrappedChatComponent
+                        .fromChatMessage(FoxSMP.getInstance().getFORMAT().replace("%name%" , impl.getPet().getCachedName()).replace("%level%", impl.getPet().getLevel()+""))[0].getHandle());
+        dataWatcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(2, WrappedDataWatcher.Registry.getChatComponentSerializer(true)), opt);
+        dataWatcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(3, WrappedDataWatcher.Registry.get(Boolean.class)), true);
+
+        final List<WrappedDataValue> wrappedDataValueList = new ArrayList<>();
+        for (final WrappedWatchableObject entry : dataWatcher.getWatchableObjects()) {
+            if (entry == null) continue;
+            final WrappedDataWatcher.WrappedDataWatcherObject watcherObject = entry.getWatcherObject();
+            wrappedDataValueList.add(new WrappedDataValue(watcherObject.getIndex(), watcherObject.getSerializer(), entry.getRawValue()));
+        }
+
+        packet.getDataValueCollectionModifier().write(0, wrappedDataValueList);
+
+        protocolManager.sendServerPacket(player, packet);
+    }
+
 
 
     // works great

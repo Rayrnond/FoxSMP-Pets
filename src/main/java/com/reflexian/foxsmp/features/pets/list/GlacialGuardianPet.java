@@ -16,4 +16,9 @@ public class GlacialGuardianPet extends SMPPet {
         return "glacial_guardian";
     }
 
+    @Override
+    public String getNiceName() {
+        return "Glacial Guardian";
+    }
+
 }
