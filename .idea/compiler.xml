@@ -9,8 +9,5 @@
         <module name="FoxSMP-Pets" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="FoxSMP" target="1.8" />
-    </bytecodeTargetLevel>
   </component>
 </project>

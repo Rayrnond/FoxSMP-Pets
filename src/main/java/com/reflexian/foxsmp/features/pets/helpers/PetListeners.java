@@ -46,10 +46,6 @@ public class PetListeners {
         Events.subscribe(PlayerJoinEvent.class)
                 .handler(event -> {
 
-                    for (BalloonImpl value : BalloonImpl.balloons.values()) {
-                        value.showFor(event.getPlayer());
-                    }
-
                     Bukkit.getScheduler().runTaskAsynchronously(FoxSMP.getInstance(),()->{
                         PlayerData playerData = PlayerData.load(event.getPlayer().getUniqueId());
                         PlayerData.map.put(event.getPlayer().getUniqueId(), playerData);
@@ -58,6 +54,10 @@ public class PetListeners {
                                 pet.updateSpeed(event.getPlayer(), false);
                             } else if (playerData.getPet() == null || !playerData.hasPet()) {
                                 new JourneyCrystalGUI().init(event.getPlayer());
+                            }
+
+                            for (BalloonImpl value : BalloonImpl.balloons.values()) {
+                                value.showFor(event.getPlayer());
                             }
                         }, 40L);
 

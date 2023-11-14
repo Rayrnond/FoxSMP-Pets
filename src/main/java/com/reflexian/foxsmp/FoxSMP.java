@@ -7,6 +7,7 @@ import com.reflexian.foxsmp.features.inventories.JourneyCrystalCommand;
 import com.reflexian.foxsmp.features.inventories.JourneyCrystalGUI;
 import com.reflexian.foxsmp.features.journeycrystal.GiveJourneyCrystalCommand;
 import com.reflexian.foxsmp.features.journeycrystal.JourneyCrystalItem;
+import com.reflexian.foxsmp.features.pets.PetCommand;
 import com.reflexian.foxsmp.features.pets.helpers.CombatListener;
 import com.reflexian.foxsmp.features.pets.helpers.CombatTask;
 import com.reflexian.foxsmp.features.pets.helpers.PetListeners;
@@ -41,10 +42,10 @@ public final class FoxSMP extends JavaPlugin {
 
         new CombatTask().runTaskTimer(this, 40, 10L);
 
+        checkInvFile("journey.yml");
         inventoryManager = new InventoryManager(this);
         inventoryManager.init();
         InvUtils.init();
-        checkInvFile("journey.yml");
 
         this.petCandyItem = new PetCandyItem(getConfig().getConfigurationSection("pet-candy"));
         this.journeyCrystalItem = new JourneyCrystalItem(getConfig().getConfigurationSection("journey-crystal"));
@@ -54,6 +55,7 @@ public final class FoxSMP extends JavaPlugin {
         new GivePetCandyCommand().register();
         new GiveJourneyCrystalCommand().register();
         new JourneyCrystalCommand().register();
+        new PetCommand().register();
 
         new Placeholders().register();
     }
