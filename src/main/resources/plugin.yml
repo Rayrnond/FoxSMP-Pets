@@ -1,4 +1,4 @@
-name: FoxSMP
+name: FoxPets
 version: '${project.version}'
 main: com.reflexian.foxsmp.FoxSMP
 api-version: 1.13

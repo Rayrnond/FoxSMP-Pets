@@ -56,6 +56,7 @@ public class BalloonHoverTask extends BukkitRunnable {
 
     }
 
+
     public boolean toggleAllHide() {
         if (tempList.isEmpty()) {
             tempList.addAll(shownTo);

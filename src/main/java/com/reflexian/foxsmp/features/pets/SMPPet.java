@@ -44,7 +44,11 @@ public abstract class SMPPet {
         cachedName = ChatColor.translateAlternateColorCodes('&', section.getString("name", "Pet"));
     }
 
+
+
     public abstract String getName(); // used for config and saving
+    public abstract String getNiceName();
+
 
     public Skin getSkin() {
         ConfigurationSection section = FoxSMP.getInstance().getConfig().getConfigurationSection("pets." + getName());

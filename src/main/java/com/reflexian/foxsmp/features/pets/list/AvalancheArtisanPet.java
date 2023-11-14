@@ -9,6 +9,8 @@ public class AvalancheArtisanPet extends SMPPet {
         super(playerData);
     }
 
+
+
     @Override
     public String getName() {
         return "avalanche_artisan";
