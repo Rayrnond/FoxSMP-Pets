@@ -133,7 +133,7 @@ public class PetListeners {
                     if (!hasPet) return;
                     if (!(playerData.getPet() instanceof PolarExplorerPet)) return;
                     double buff = 1 + 0.29 * playerData.getPet().getLevel(); // 1% at level 0, 15% at level 100
-                    boolean proc = new Random().nextDouble() < buff;
+                    boolean proc = new Random().nextDouble() < (buff / 100);
                     if (proc) {
                         for (ItemStack drop : event.getBlock().getDrops(player.getInventory().getItemInMainHand(), player)) {
                             event.getPlayer().getWorld().dropItem(event.getBlock().getLocation(), drop);
