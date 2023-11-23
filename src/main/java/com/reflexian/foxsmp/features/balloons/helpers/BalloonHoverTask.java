@@ -29,6 +29,8 @@ public class BalloonHoverTask extends BukkitRunnable {
     private final int entityId = (int) (Math.random() * Integer.MAX_VALUE);
     private final UUID armorStandUUID = UUID.randomUUID();
 
+    private long lastSpawned = System.currentTimeMillis();
+
     private boolean hidden = false;
 
     private final Queue<Player> tempList = new ConcurrentLinkedQueue<>();
@@ -58,6 +60,7 @@ public class BalloonHoverTask extends BukkitRunnable {
 
 
     public boolean toggleAllHide() {
+        lastSpawned = System.currentTimeMillis();
         if (tempList.isEmpty()) {
             tempList.addAll(shownTo);
             for (Player player : shownTo) {
@@ -86,6 +89,7 @@ public class BalloonHoverTask extends BukkitRunnable {
     }
 
     public void kill() {
+
         this.cancel();
         for (Player player : shownTo) {
             if (player == null || !player.isOnline()) continue;
@@ -95,6 +99,7 @@ public class BalloonHoverTask extends BukkitRunnable {
     }
 
     public void respawn() {
+        lastSpawned = System.currentTimeMillis();
         final Location l = calculatePetLocation(impl.getOwner().getLocation());
         for (Player player : shownTo) {
             if (player == null || !player.isOnline()) continue;
@@ -111,6 +116,13 @@ public class BalloonHoverTask extends BukkitRunnable {
             throw new RuntimeException("BalloonHoverTask cannot be ran on the main thread!");
         }
         try {
+
+            // check if lastUpdated is more than 5 minutes ago
+            if (System.currentTimeMillis() - lastSpawned > 5 * 60 * 1000) {
+                respawn();
+                return;
+            }
+
             double hoverHeight = Math.sin(phase);
             phase += Math.PI / 60; // Adjust speed of hovering here
 

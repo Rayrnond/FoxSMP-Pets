@@ -1,13 +1,17 @@
 package com.reflexian.foxsmp.features.pets.helpers;
 
+import com.reflexian.foxsmp.FoxSMP;
 import com.reflexian.foxsmp.features.pets.list.NorthernNomadPet;
 import com.reflexian.foxsmp.utilities.data.PlayerData;
 import nl.marido.deluxecombat.api.DeluxeCombatAPI;
 import nl.marido.deluxecombat.events.CombatStateChangeEvent;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 
 public class CombatListener implements Listener {
 
@@ -49,6 +53,22 @@ public class CombatListener implements Listener {
             }
             playerData.getPet().getBalloon().getTask().toggleAllHide();
         }
+    }
+
+    @EventHandler
+    public void onDeath(PlayerRespawnEvent event) {
+        PlayerData playerData = PlayerData.map.getOrDefault(event.getPlayer().getUniqueId(),null);
+        if (playerData==null || !playerData.hasPet()) return;
+
+        Bukkit.getScheduler().runTaskLater(FoxSMP.getInstance(), () -> {
+            if (playerData.hasPet() && playerData.getPet() instanceof NorthernNomadPet pet) {
+                pet.updateSpeed(event.getPlayer(), false);
+            }
+
+            playerData.getPet().getBalloon().getTask().removeShownTo(event.getPlayer());
+            playerData.getPet().getBalloon().getTask().addShownTo(event.getPlayer());
+
+        }, 3*20);
 
     }
 

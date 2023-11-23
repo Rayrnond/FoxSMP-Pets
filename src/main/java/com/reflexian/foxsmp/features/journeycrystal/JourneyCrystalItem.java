@@ -2,6 +2,7 @@ package com.reflexian.foxsmp.features.journeycrystal;
 
 import com.reflexian.foxsmp.FoxSMP;
 import com.reflexian.foxsmp.features.inventories.JourneyCrystalGUI;
+import com.reflexian.foxsmp.features.pets.list.NorthernNomadPet;
 import com.reflexian.foxsmp.utilities.data.PlayerData;
 import com.reflexian.foxsmp.utilities.inventory.InvLang;
 import com.reflexian.foxsmp.utilities.objects.ItemBuilder;
@@ -64,6 +65,10 @@ public class JourneyCrystalItem {
                             if (playerData == null || !playerData.hasPet()) {
                                 player.sendMessage("§cYou don't have a pet!");
                                 return;
+                            }
+
+                            if (playerData.hasPet() && playerData.getPet() instanceof NorthernNomadPet pet) {
+                                event.getPlayer().setWalkSpeed(0.2f);
                             }
 
                             if (playerData.hasPet()) {

@@ -76,13 +76,21 @@ public class PetCandyItem {
 
                             player.sendMessage("§eYou used pet candy!");
 
-                            if (item.getAmount() > 1) {
-                                item.setAmount(item.getAmount() - 1);
-                                player.getInventory().setItem(event.getHand(), item);
-                            } else {
-                                player.getInventory().setItem(event.getHand(), null);
+                            int amount = 1;
+                            if (player.isSneaking()) {
+                                amount=item.getAmount();
                             }
-                            int amount = FoxSMP.getInstance().getConfig().getInt("pet-candy.xp",200);
+
+                            for (int i = 0; i < amount; i++) {
+                                if (item.getAmount() > 1) {
+                                    item.setAmount(item.getAmount() - 1);
+                                    player.getInventory().setItem(event.getHand(), item);
+                                } else {
+                                    player.getInventory().setItem(event.getHand(), null);
+                                    break;
+                                }
+                            }
+                            amount = FoxSMP.getInstance().getConfig().getInt("pet-candy.xp",200);
                             playerData.getPet().setXp(playerData.getPet().getXp() + amount);
                             player.sendMessage("§aYour pet gained §e"+amount+"§a XP!");
                             player.sendMessage("§aYour pet is now level §e"+playerData.getPet().getLevel()+"§a!");
