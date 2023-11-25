@@ -14,10 +14,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.inventory.CraftItemEvent;
+import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class PetCandyItem {
@@ -50,7 +53,38 @@ public class PetCandyItem {
         ShapedRecipe recipe = new ShapedRecipe(new NamespacedKey("foxsmp", "petcandy"), petCandyItem);
         setRecipeFromConfig(section.getConfigurationSection("recipe"), recipe);
         Bukkit.getServer().addRecipe(recipe);
+        FoxSMP.getInstance().getLogger().info("Registered pet candy recipe: " + recipe.getKey());
 
+        Bukkit.getScheduler().runTaskTimer(FoxSMP.getInstance(), () -> {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (!player.hasDiscoveredRecipe(recipe.getKey())) {
+                    player.discoverRecipe(recipe.getKey());
+                }
+            }
+        }, 5, 4);
+
+        Listener debugListener = new Listener() {
+
+            @EventHandler
+            public void onCraftInterfere(PrepareItemCraftEvent event) {
+                Arrays.stream(event.getHandlers().getRegisteredListeners()).forEach(listener -> {
+                    String pluginName = listener.getPlugin().getName();
+                    System.out.println(pluginName);
+                });
+            }
+
+            @EventHandler
+            public void onPreCraftInterfere(CraftItemEvent event) {
+                Arrays.stream(event.getHandlers().getRegisteredListeners()).forEach(listener -> {
+                    String pluginName = listener.getPlugin().getName();
+                    System.out.println(pluginName);
+                });
+            }
+
+
+        };
+
+        //Bukkit.getServer().getPluginManager().registerEvents(debugListener, FoxSMP.getInstance());
 
         Listener listener = new Listener() {
             @EventHandler
@@ -90,7 +124,8 @@ public class PetCandyItem {
                                     break;
                                 }
                             }
-                            amount = FoxSMP.getInstance().getConfig().getInt("pet-candy.xp",200);
+                            int expPer = FoxSMP.getInstance().getConfig().getInt("pet-candy.xp",200);
+                            amount = amount * expPer;
                             playerData.getPet().setXp(playerData.getPet().getXp() + amount);
                             player.sendMessage("§aYour pet gained §e"+amount+"§a XP!");
                             player.sendMessage("§aYour pet is now level §e"+playerData.getPet().getLevel()+"§a!");

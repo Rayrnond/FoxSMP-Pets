@@ -79,7 +79,7 @@ public class PetListeners implements Listener {
         if (recentSwaps.contains(event.getPlayer().getUniqueId())) {
             recentSwaps.remove(event.getPlayer().getUniqueId());
             PlayerData playerData = PlayerData.map.getOrDefault(event.getPlayer().getUniqueId(),null);
-            if (playerData == null) return;
+            if (playerData == null || playerData.getPet() == null) return;
             playerData.getPet().getBalloon().getTask().respawn();
         }
     }

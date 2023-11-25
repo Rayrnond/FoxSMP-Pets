@@ -2,6 +2,7 @@ package com.reflexian.foxsmp;
 
 import com.reflexian.foxsmp.features.balloons.helpers.BalloonImpl;
 import com.reflexian.foxsmp.features.candy.GivePetCandyCommand;
+import com.reflexian.foxsmp.features.candy.HidePetCommand;
 import com.reflexian.foxsmp.features.candy.PetCandyItem;
 import com.reflexian.foxsmp.features.inventories.JourneyCrystalCommand;
 import com.reflexian.foxsmp.features.journeycrystal.GiveJourneyCrystalCommand;
@@ -56,6 +57,7 @@ public final class FoxSMP extends JavaPlugin {
         new GivePetCandyCommand().register();
         new GiveJourneyCrystalCommand().register();
         new JourneyCrystalCommand().register();
+        new HidePetCommand().register();
 //        new PetCommand().register();
 
         new Placeholders().register();
